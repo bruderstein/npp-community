@@ -173,9 +173,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	LPTSTR cmdLine = ::GetCommandLine();
 	ParamVector params;
 	parseCommandLine(cmdLine, params);
-	TCHAR msgTemp[200];
-	_stprintf(msgTemp, TEXT("size of long_ptr %d, size of long %d, size of sptr_t %d, size of LPARAM %d"), sizeof(LONG_PTR), sizeof(long), sizeof(sptr_t), sizeof(LPARAM));
-	MessageBox(NULL, msgTemp, TEXT("txt"), 0);
 
 #ifndef SHIPPING
 	if (isInList(FLAG_RUN_UNITTESTS, params))
