@@ -74,10 +74,10 @@ DockingManager::DockingManager()
 	/* create four containers with splitters */
 	for (int i = 0; i < DOCKCONT_MAX; i++)
 	{
-		DockingCont *_pDockCont = new DockingCont;
+		DockingCont*		_pDockCont = new DockingCont;
 		_vContainer.push_back(_pDockCont);
 
-		DockingSplitter *_pSplitter = new DockingSplitter;
+		DockingSplitter*	_pSplitter = new DockingSplitter;
 		_vSplitter.push_back(_pSplitter);
 	}
 
@@ -187,11 +187,11 @@ LRESULT CALLBACK DockingManager::staticWinProc(HWND hwnd, UINT message, WPARAM w
 		case WM_NCCREATE :
 			pDockingManager = (DockingManager *)(((LPCREATESTRUCT)lParam)->lpCreateParams);
 			pDockingManager->_hSelf = hwnd;
-			::SetWindowLongPtr(hwnd, GWL_USERDATA, reinterpret_cast<LONG>(pDockingManager));
+			::SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pDockingManager));
 			return TRUE;
 
 		default :
-			pDockingManager = (DockingManager *)::GetWindowLongPtr(hwnd, GWL_USERDATA);
+			pDockingManager = (DockingManager *)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 			if (!pDockingManager)
 				return ::DefWindowProc(hwnd, message, wParam, lParam);
 			return pDockingManager->runProc(hwnd, message, wParam, lParam);
@@ -666,7 +666,7 @@ void DockingManager::createDockableDlg(tTbData* data, int iCont, bool isVisible)
 
 	// attach toolbar
 	if (_vContainer.size() > (size_t)iCont && _vContainer[iCont] != NULL)
-		_vContainer[iCont]->createToolbar(data);
+	_vContainer[iCont]->createToolbar(data);
 
 	/* notify client app */
 	if (iCont < DOCKCONT_MAX)
@@ -685,7 +685,7 @@ void DockingManager::setActiveTab(int iCont, int iItem)
 
 void DockingManager::showDockableDlg(HWND hDlg, BOOL view)
 {
-	tTbData *pTbData = NULL;
+	tTbData*	pTbData =	NULL;
 	for (size_t i = 0; i < _vContainer.size(); i++)
 	{
 		pTbData = _vContainer[i]->findToolbarByWnd(hDlg);
@@ -699,7 +699,7 @@ void DockingManager::showDockableDlg(HWND hDlg, BOOL view)
 
 void DockingManager::showDockableDlg(TCHAR* pszName, BOOL view)
 {
-	tTbData *pTbData = NULL;
+	tTbData*	pTbData =	NULL;
 	for (size_t i = 0; i < _vContainer.size(); i++)
 	{
 		pTbData = _vContainer[i]->findToolbarByName(pszName);
@@ -996,3 +996,15 @@ int DockingManager::FindEmptyContainer()
     /* search for empty arrays */
     return iRetCont;
 }
+
+LRESULT DockingManager::SendNotify(HWND hWnd, UINT message)
+{
+	NMHDR	nmhdr;
+
+	nmhdr.code		= message;
+	nmhdr.hwndFrom	= _hParent;
+	nmhdr.idFrom	= ::GetDlgCtrlID(_hParent);
+	::SendMessage(hWnd, WM_NOTIFY, nmhdr.idFrom, (LPARAM)&nmhdr);
+	return ::GetWindowLongPtr(hWnd, DWL_MSGRESULT);
+}
+

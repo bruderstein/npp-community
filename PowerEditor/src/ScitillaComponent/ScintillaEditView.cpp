@@ -249,15 +249,15 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 	//Use either Unicode or ANSI setwindowlong, depending on environment
 	if (::IsWindowUnicode(_hSelf))
 	{
-		::SetWindowLongPtrW(_hSelf, GWL_USERDATA, reinterpret_cast<LONG>(this));
+		::SetWindowLongPtrW(_hSelf, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 		_callWindowProc = CallWindowProcW;
-		_scintillaDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtrW(_hSelf, GWL_WNDPROC, reinterpret_cast<LONG>(scintillaStatic_Proc)));
+		_scintillaDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtrW(_hSelf, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(scintillaStatic_Proc)));
 	}
 	else
 	{
-		::SetWindowLongPtrA(_hSelf, GWL_USERDATA, reinterpret_cast<LONG>(this));
+		::SetWindowLongPtrA(_hSelf, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 		_callWindowProc = CallWindowProcA;
-		_scintillaDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtrA(_hSelf, GWL_WNDPROC, reinterpret_cast<LONG>(scintillaStatic_Proc)));
+		_scintillaDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtrA(_hSelf, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(scintillaStatic_Proc)));
 	}
 
 	//Get the startup document and make a buffer for it so it can be accessed like a file
@@ -2208,47 +2208,47 @@ void ScintillaEditView::currentLinesDown() const
 
 void ScintillaEditView::convertSelectedTextTo(bool Case)
 {
-	unsigned int codepage = _codepage;
-	UniMode um = getCurrentBuffer()->getUnicodeMode();
-	if (um != uni8Bit)
-	codepage = CP_UTF8;
+   unsigned int codepage = _codepage;
+   UniMode um = getCurrentBuffer()->getUnicodeMode();
+   if (um != uni8Bit)
+       codepage = CP_UTF8;
 
 	if (execute(SCI_GETSELECTIONS) > 1) // Multi-Selection || Column mode
-	{
-        execute(SCI_BEGINUNDOACTION);
+   {
+       execute(SCI_BEGINUNDOACTION);
 
         //int selStart = execute(SCI_GETSELECTIONSTART);
         //int selEnd = execute(SCI_GETSELECTIONEND);
 
          ColumnModeInfos cmi = getColumnModeSelectInfo();
 
-         for (size_t i = 0 ; i < cmi.size() ; i++)
-         {
+       for (size_t i = 0 ; i < cmi.size() ; i++)
+       {
 			 const int len = cmi[i]._selRpos - cmi[i]._selLpos;
 			char *srcStr = new char[len+1];
 			wchar_t *destStr = new wchar_t[len+1];
 
              int start = cmi[i]._selLpos;
              int end = cmi[i]._selRpos;
-             getText(srcStr, start, end);
+           getText(srcStr, start, end);
 
-             int nbChar = ::MultiByteToWideChar(codepage, 0, srcStr, len, destStr, len);
+           int nbChar = ::MultiByteToWideChar(codepage, 0, srcStr, len, destStr, len);
 
-             for (int j = 0 ; j < nbChar ; j++)
-             {
-                 if (Case == UPPERCASE)
-                     destStr[j] = (wchar_t)::CharUpperW((LPWSTR)destStr[j]);
-                 else
-                     destStr[j] = (wchar_t)::CharLowerW((LPWSTR)destStr[j]);
-             }
-             ::WideCharToMultiByte(codepage, 0, destStr, len, srcStr, len, NULL, NULL);
+           for (int j = 0 ; j < nbChar ; j++)
+           {
+               if (Case == UPPERCASE)
+                   destStr[j] = (wchar_t)::CharUpperW((LPWSTR)destStr[j]);
+               else
+                   destStr[j] = (wchar_t)::CharLowerW((LPWSTR)destStr[j]);
+           }
+           ::WideCharToMultiByte(codepage, 0, destStr, len, srcStr, len, NULL, NULL);
 
-             execute(SCI_SETTARGETSTART, start);
-             execute(SCI_SETTARGETEND, end);
-             execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)srcStr);
+           execute(SCI_SETTARGETSTART, start);
+           execute(SCI_SETTARGETEND, end);
+           execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)srcStr);
 
-			 delete [] srcStr;
-			 delete [] destStr;
+       delete [] srcStr;
+       delete [] destStr;
          }
 
 		 setMultiSelections(cmi);
@@ -2256,45 +2256,45 @@ void ScintillaEditView::convertSelectedTextTo(bool Case)
          //execute(SCI_SETSELECTIONSTART, selStart);
          //execute(SCI_SETSELECTIONEND, selEnd);
 
-         execute(SCI_ENDUNDOACTION);
-		return;
-	}
+       execute(SCI_ENDUNDOACTION);
+       return;
+   }
 
-	size_t selectionStart = execute(SCI_GETSELECTIONSTART);
-	size_t selectionEnd = execute(SCI_GETSELECTIONEND);
+   size_t selectionStart = execute(SCI_GETSELECTIONSTART);
+   size_t selectionEnd = execute(SCI_GETSELECTIONEND);
 
-	int strSize = ((selectionEnd > selectionStart)?(selectionEnd - selectionStart):(selectionStart - selectionEnd))+1;
-	if (strSize)
-	{
-		char *selectedStr = new char[strSize+1];
-		int strWSize = strSize * 2;
-		wchar_t *selectedStrW = new wchar_t[strWSize+3];
+   int strSize = ((selectionEnd > selectionStart)?(selectionEnd - selectionStart):(selectionStart - selectionEnd))+1;
+   if (strSize)
+   {
+       char *selectedStr = new char[strSize+1];
+       int strWSize = strSize * 2;
+       wchar_t *selectedStrW = new wchar_t[strWSize+3];
 
-		execute(SCI_GETSELTEXT, 0, (LPARAM)selectedStr);
+       execute(SCI_GETSELTEXT, 0, (LPARAM)selectedStr);
 
-		int nbChar = ::MultiByteToWideChar(codepage, 0, selectedStr, strSize, selectedStrW, strWSize);
+       int nbChar = ::MultiByteToWideChar(codepage, 0, selectedStr, strSize, selectedStrW, strWSize);
 
-		for (int i = 0 ; i < nbChar ; i++)
-		{
-			if (Case == UPPERCASE)
-				selectedStrW[i] = (WCHAR)::CharUpperW((LPWSTR)selectedStrW[i]);
-			else
-				selectedStrW[i] = (WCHAR)::CharLowerW((LPWSTR)selectedStrW[i]);
-		}
-		::WideCharToMultiByte(codepage, 0, selectedStrW, strWSize, selectedStr, strSize, NULL, NULL);
+       for (int i = 0 ; i < nbChar ; i++)
+       {
+           if (Case == UPPERCASE)
+               selectedStrW[i] = (WCHAR)::CharUpperW((LPWSTR)selectedStrW[i]);
+           else
+               selectedStrW[i] = (WCHAR)::CharLowerW((LPWSTR)selectedStrW[i]);
+       }
+       ::WideCharToMultiByte(codepage, 0, selectedStrW, strWSize, selectedStr, strSize, NULL, NULL);
 
-		execute(SCI_REPLACESEL, strSize, (LPARAM)selectedStr);
-		execute(SCI_SETSEL, selectionStart, selectionEnd);
-		delete [] selectedStr;
-		delete [] selectedStrW;
-	}
+       execute(SCI_REPLACESEL, strSize, (LPARAM)selectedStr);
+       execute(SCI_SETSEL, selectionStart, selectionEnd);
+       delete [] selectedStr;
+       delete [] selectedStrW;
+   }
 }
 
 
 
 std::pair<int, int> ScintillaEditView::getWordRange()
 {
-    int caretPos = execute(SCI_GETCURRENTPOS, 0, 0);
+	int caretPos = execute(SCI_GETCURRENTPOS, 0, 0);
 	int startPos = static_cast<int>(execute(SCI_WORDSTARTPOSITION, caretPos, true));
 	int endPos = static_cast<int>(execute(SCI_WORDENDPOSITION, caretPos, true));
     return std::pair<int, int>(startPos, endPos);
@@ -2379,10 +2379,10 @@ TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbDigits, bool
 }
 
 ColumnModeInfos ScintillaEditView::getColumnModeSelectInfo()
-{
+	{
 	ColumnModeInfos columnModeInfos;
 	if (execute(SCI_GETSELECTIONS) > 1) // Multi-Selection || Column mode
-	{
+		{
 		int nbSel = execute(SCI_GETSELECTIONS);
 
 		for (int i = 0 ; i < nbSel ; i++)
@@ -2401,8 +2401,8 @@ ColumnModeInfos ScintillaEditView::getColumnModeSelectInfo()
 				columnModeInfos.push_back(ColumnModeInfo(absPosSelEndPerLine, absPosSelStartPerLine, i, R2L, nbVirtualAnchorSpc, nbVirtualCaretSpc));
 			else
 				columnModeInfos.push_back(ColumnModeInfo(absPosSelStartPerLine, absPosSelEndPerLine, i, L2R, nbVirtualAnchorSpc, nbVirtualCaretSpc));
+			}
 		}
-	}
 	return columnModeInfos;
 }
 
@@ -2414,7 +2414,7 @@ void ScintillaEditView::columnReplace(ColumnModeInfos & cmi, const TCHAR *str)
 		if (cmi[i].isValid())
 		{
 			int len2beReplace = cmi[i]._selRpos - cmi[i]._selLpos;
-			int diff = lstrlen(str) - len2beReplace;
+		int diff = lstrlen(str) - len2beReplace;
 
 			cmi[i]._selLpos += totalDiff;
 			cmi[i]._selRpos += totalDiff;
@@ -2434,12 +2434,12 @@ void ScintillaEditView::columnReplace(ColumnModeInfos & cmi, const TCHAR *str)
 			execute(SCI_SETTARGETEND, cmi[i]._selRpos);
 
 #ifdef UNICODE
-			WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
-			unsigned int cp = execute(SCI_GETCODEPAGE);
-			const char *strA = wmc->wchar2char(str, cp);
-			execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)strA);
+		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+		unsigned int cp = execute(SCI_GETCODEPAGE);
+		const char *strA = wmc->wchar2char(str, cp);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)strA);
 #else
-			execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str);
 #endif
 
 			if (hasVirtualSpc)
@@ -2452,7 +2452,7 @@ void ScintillaEditView::columnReplace(ColumnModeInfos & cmi, const TCHAR *str)
 			}
 			else
 			{
-				totalDiff += diff;
+		totalDiff += diff;
 			}
 			cmi[i]._selRpos += diff;
 		}
@@ -2497,25 +2497,25 @@ void ScintillaEditView::columnReplace(ColumnModeInfos & cmi, int initial, int in
 		if (cmi[i].isValid())
 		{
 			int len2beReplace = cmi[i]._selRpos - cmi[i]._selLpos;
-			int diff = nb - len2beReplace;
+		int diff = nb - len2beReplace;
 
 			cmi[i]._selLpos += totalDiff;
 			cmi[i]._selRpos += totalDiff;
 
-			int2str(str, stringSize, initial, base, nb, isZeroLeading);
+		int2str(str, stringSize, initial, base, nb, isZeroLeading);
 
 			execute(SCI_SETTARGETSTART, cmi[i]._selLpos);
 			execute(SCI_SETTARGETEND, cmi[i]._selRpos);
 #ifdef UNICODE
-			WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
-			unsigned int cp = execute(SCI_GETCODEPAGE);
-			const char *strA = wmc->wchar2char(str, cp);
-			execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)strA);
+		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+		unsigned int cp = execute(SCI_GETCODEPAGE);
+		const char *strA = wmc->wchar2char(str, cp);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)strA);
 #else
-			execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str);
 #endif
-			initial += incr;
-			totalDiff += diff;
+		initial += incr;
+		totalDiff += diff;
 			cmi[i]._selRpos += diff;
 		}
 	}
@@ -3216,7 +3216,7 @@ bool ScintillaEditView::isSelecting() const
 
 LRESULT CALLBACK ScintillaEditView::scintillaStatic_Proc( HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam )
 {
-	ScintillaEditView *pScint = (ScintillaEditView *)(::GetWindowLongPtr(hwnd, GWL_USERDATA));
+	ScintillaEditView *pScint = (ScintillaEditView *)(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
 	//
 	if (Message == WM_MOUSEWHEEL || Message == WM_MOUSEHWHEEL)
 	{
@@ -3224,7 +3224,7 @@ LRESULT CALLBACK ScintillaEditView::scintillaStatic_Proc( HWND hwnd, UINT Messag
 		POINTS pts = MAKEPOINTS(lParam);
 		POINTSTOPOINT(pt, pts);
 		HWND hwndOnMouse = WindowFromPoint(pt);
-		ScintillaEditView *pScintillaOnMouse = (ScintillaEditView *)(::GetWindowLongPtr(hwndOnMouse, GWL_USERDATA));
+		ScintillaEditView *pScintillaOnMouse = (ScintillaEditView *)(::GetWindowLongPtr(hwndOnMouse, GWLP_USERDATA));
 		if (pScintillaOnMouse != pScint)
 			return ::SendMessage(hwndOnMouse, Message, wParam, lParam);
 	}

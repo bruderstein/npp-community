@@ -95,7 +95,7 @@ TabBar::TabBar() :
 TabBar::~TabBar()
 {
 	TabBar::destroy();
-}
+	}
 
 void TabBar::init(HINSTANCE hInst, HWND parent, bool isVertical, bool isTraditional, bool isMultiLine)
 {
@@ -196,12 +196,12 @@ void TabBar::setFont(TCHAR *fontName, size_t fontSize)
 	}
 
 	_hFont = ::CreateFont( fontSize, 0,
-						  (_isVertical) ? 900:0,
-						  (_isVertical) ? 900:0,
-		                   FW_NORMAL,
-			               0, 0, 0, 0,
-			               0, 0, 0, 0,
-				           fontName);
+		(_isVertical) ? 900:0,
+		(_isVertical) ? 900:0,
+		FW_NORMAL,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		fontName);
 	if (_hFont)
 	{
 		::SendMessage(_hSelf, WM_SETFONT, reinterpret_cast<WPARAM>(_hFont), 0);
@@ -390,8 +390,8 @@ void TabBarPlus::init(HINSTANCE hInst, HWND parent, bool isVertical, bool isTrad
 		}
 		_nbCtrl++;
 
-        ::SetWindowLongPtr(_hSelf, GWL_USERDATA, reinterpret_cast<LONG>(this));
-	    _tabBarDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(_hSelf, GWL_WNDPROC, reinterpret_cast<LONG>(TabBarPlus_Proc)));
+        ::SetWindowLongPtr(_hSelf, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+	    _tabBarDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(_hSelf, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(TabBarPlus_Proc)));
     }
 
 	LOGFONT LogFont;
