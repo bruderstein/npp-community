@@ -34,6 +34,10 @@
 #include "ScintillaRef.h"
 #endif
 
+#ifndef NUMBERTYPES_H
+#include "NumberTypes.h"
+#endif
+
 // Forward declarations
 class NppParameters;
 struct CharacterRange;
@@ -60,6 +64,8 @@ struct Lang;
 
 #define NB_WORD_LIST 4
 #define WORD_LIST_LEN 256
+
+
 
 typedef int (* SCINTILLA_FUNC) (void*, UINT, WPARAM, LPARAM);
 typedef void * SCINTILLA_PTR;
@@ -121,7 +127,7 @@ typedef void * SCINTILLA_PTR;
 // 15 - 0  are free to use for plugins
 
 
-int getNbDigits(int aNum, int base);
+int getNbDigits(DOCPOSITION aNum, int base);
 
 TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbChiffre, bool isZeroLeading);
 
@@ -192,10 +198,10 @@ public:
 
 	void activateBuffer(BufferID buffer);
 
-	void getText(char *dest, int start, int end) const;
-	void getGenericText(TCHAR *dest, int start, int end) const;
-	void getGenericText(TCHAR *dest, int start, int end, int *mstart, int *mend) const;
-	void insertGenericTextFrom(int position, const TCHAR *text2insert) const;
+	void getText(char *dest, DOCPOSITION start, DOCPOSITION end) const;
+	void getGenericText(TCHAR *dest, DOCPOSITION start, DOCPOSITION end) const;
+	void getGenericText(TCHAR *dest, DOCPOSITION start, DOCPOSITION end, DOCPOSITION *mstart, DOCPOSITION *mend) const;
+	void insertGenericTextFrom(DOCPOSITION position, const TCHAR *text2insert) const;
 	void replaceSelWith(const char * replaceText);
 
 	int getSelectedTextCount();
@@ -209,12 +215,12 @@ public:
 	void appandGenericText(const TCHAR * text2Append) const;
 	void addGenericText(const TCHAR * text2Append) const;
 	void addGenericText(const TCHAR * text2Append, long *mstart, long *mend) const;
-	int replaceTarget(const TCHAR * str2replace, int fromTargetPos = -1, int toTargetPos = -1) const;
-	int replaceTargetRegExMode(const TCHAR * re, int fromTargetPos = -1, int toTargetPos = -1) const;
+	int replaceTarget(const TCHAR * str2replace, DOCPOSITION fromTargetPos = -1, DOCPOSITION toTargetPos = -1) const;
+	int replaceTargetRegExMode(const TCHAR * re, DOCPOSITION fromTargetPos = -1, DOCPOSITION toTargetPos = -1) const;
 	void showAutoComletion(int lenEntered, const TCHAR * list);
 	void showCallTip(int startPos, const TCHAR * def);
-	void getLine(int lineNumber, TCHAR * line, int lineBufferLen);
-	void addText(int length, const char *buf);
+	void getLine(LINENUMBER lineNumber, TCHAR * line, int lineBufferLen);
+	void addText(DOCPOSITION length, const char *buf);
 
 	void saveCurrentPos();
 	void restoreCurrentPos();
@@ -267,7 +273,7 @@ public:
 	long getCurrentXOffset()const;
 	void setCurrentXOffset(long xOffset);
 
-	void scroll(int column, int line);
+	void scroll(int column, LINENUMBER line);
 
 	long getCurrentPointX()const;
 	long getCurrentPointY()const;

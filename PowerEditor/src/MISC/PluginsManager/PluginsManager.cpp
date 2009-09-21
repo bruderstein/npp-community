@@ -196,7 +196,8 @@ int PluginsManager::loadPlugin(const generic_string& pluginFilePath, std::vector
 		}
 
 		_pluginInfos.push_back(pi);
-        return (_pluginInfos.size() - 1);
+		assert(_pluginInfos.size() == static_cast<int>(_pluginInfos.size()));
+        return (static_cast<int>(_pluginInfos.size()) - 1);
 	}
 	catch(generic_string s)
 	{
@@ -314,7 +315,7 @@ void PluginsManager::addInMenuFromPMIndex(int i)
 
         _pluginsCommands.push_back(PluginCommand(_pluginInfos[i]->_moduleName.c_str(), j, _pluginInfos[i]->_funcItems[j]._pFunc));
 
-		int cmdID = ID_PLUGINS_CMD + (_pluginsCommands.size() - 1);
+		int cmdID = ID_PLUGINS_CMD + (static_cast<int>(_pluginsCommands.size()) - 1);
 		_pluginInfos[i]->_funcItems[j]._cmdID = cmdID;
 		generic_string itemName = _pluginInfos[i]->_funcItems[j]._itemName;
 
@@ -356,7 +357,7 @@ void PluginsManager::setMenu(HMENU hMenu, const TCHAR *menuName)
 		    ::InsertMenu(hMenu, 9, MF_BYPOSITION | MF_POPUP, (UINT_PTR)_hPluginsMenu, nom_menu);
         }
 
-		for (size_t i = 0 ; i < _pluginInfos.size() ; i++)
+		for (int i = 0 ; i < static_cast<int>(_pluginInfos.size()) ; i++)
 		{
             addInMenuFromPMIndex(i);
 		}
