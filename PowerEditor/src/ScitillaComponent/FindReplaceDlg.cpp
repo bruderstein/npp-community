@@ -37,10 +37,10 @@ LONG_PTR FindReplaceDlg::originalFinderProc = NULL;
 #define STYLING_MASK 255
 
 struct FoundInfo {
-	FoundInfo(int start, int end, const TCHAR *fullPath)
+	FoundInfo(DOCPOSITION start, DOCPOSITION end, const TCHAR *fullPath)
 		: _start(start), _end(end), _fullPath(fullPath) {};
-	int _start;
-	int _end;
+	DOCPOSITION _start;
+	DOCPOSITION _end;
 	generic_string _fullPath;
 };
 
@@ -229,7 +229,7 @@ public:
 	void DeleteResult();
 
 protected :
-	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 	bool notify(SCNotification *notification);
 
 private:
@@ -651,7 +651,7 @@ void FindReplaceDlg::updateCombos()
 	updateCombo(IDFINDWHAT);
 }
 
-BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -1522,7 +1522,7 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 
 	//Initial range for searching
 	(*_ppEditView)->execute(SCI_SETSEARCHFLAGS, flags);
-	int targetStart = (*_ppEditView)->searchInTarget(pTextFind, startRange, endRange);
+	DOCPOSITION targetStart = (*_ppEditView)->searchInTarget(pTextFind, startRange, endRange);
 
 	if ((targetStart != -1) && (op == ProcessFindAll))	//add new filetitle if this file results in hits
 	{
@@ -1531,13 +1531,13 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 	while (targetStart != -1)
 	{
 		//int posFindBefore = posFind;
-		targetStart = int((*_ppEditView)->execute(SCI_GETTARGETSTART));
-		int targetEnd = int((*_ppEditView)->execute(SCI_GETTARGETEND));
+		targetStart = (*_ppEditView)->execute(SCI_GETTARGETSTART);
+		DOCPOSITION targetEnd = (*_ppEditView)->execute(SCI_GETTARGETEND);
 		if (targetEnd > endRange) {	//we found a result but outside our range, therefore do not process it
 			break;
 		}
-		int foundTextLen = targetEnd - targetStart;
-		int replaceDelta = 0;
+		DOCPOSITION foundTextLen = targetEnd - targetStart;
+		DOCPOSITION replaceDelta = 0;
 
 		// Search resulted in empty token, possible with RE
 		if (!foundTextLen) {
@@ -1598,8 +1598,8 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 
 				if (_doMarkLine)
 				{
-					int lineNumber = (*_ppEditView)->execute(SCI_LINEFROMPOSITION, targetStart);
-					int state = (*_ppEditView)->execute(SCI_MARKERGET, lineNumber);
+					LINENUMBER lineNumber = (*_ppEditView)->execute(SCI_LINEFROMPOSITION, targetStart);
+					int state = static_cast<int>((*_ppEditView)->execute(SCI_MARKERGET, lineNumber));
 
 					if (!(state & (1 << MARK_BOOKMARK)))
 						(*_ppEditView)->execute(SCI_MARKERADD, lineNumber, MARK_BOOKMARK);
@@ -2226,7 +2226,7 @@ void Finder::setFinderStyle()
 	_scintView.execute(SCI_COLOURISE, 0, -1);
 }
 
-BOOL CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -2291,7 +2291,7 @@ BOOL CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 				scintillaContextmenu.display(p);
 				return TRUE;
 			}
-			return ::DefWindowProc(_hSelf, message, wParam, lParam);
+			return static_cast<BOOL>(::DefWindowProc(_hSelf, message, wParam, lParam));
 		}
 
 		case WM_SIZE :
@@ -2357,7 +2357,7 @@ void FindIncrementDlg::display(bool toShow) const
 #define SHIFTED 0x8000
 #define BCKGRD_COLOR (RGB(255,102,102))
 #define TXT_COLOR    (RGB(255,255,255))
-BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
+LRESULT CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (message)
 	{

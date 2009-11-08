@@ -85,11 +85,11 @@ void FunctionCallTip::close() {
 // for loop index variable ’Symbol’ whose type category is ’String’modified in body of the for loop
 //lint -e850
 bool FunctionCallTip::getCursorFunction() {
-	int line = _pEditView->execute(SCI_LINEFROMPOSITION, _curPos);
-	int startpos = _pEditView->execute(SCI_POSITIONFROMLINE, line);
-	int endpos = _pEditView->execute(SCI_GETLINEENDPOSITION, line);
-	int len = endpos - startpos + 3;	//also take CRLF in account, even if not there
-	int offset = _curPos - startpos;	//offset is cursor location, only stuff before cursor has influence
+	LINENUMBER line = _pEditView->execute(SCI_LINEFROMPOSITION, _curPos);
+	DOCPOSITION startpos = _pEditView->execute(SCI_POSITIONFROMLINE, line);
+	DOCPOSITION endpos = _pEditView->execute(SCI_GETLINEENDPOSITION, line);
+	DOCPOSITION len = endpos - startpos + 3;	//also take CRLF in account, even if not there
+	DOCPOSITION offset = _curPos - startpos;	//offset is cursor location, only stuff before cursor has influence
 	const int maxLen = 128;
 
 	if ((offset < 2) || (len >= maxLen))
@@ -108,7 +108,7 @@ bool FunctionCallTip::getCursorFunction() {
 	std::vector< Token > tokenVector;
 	int tokenLen = 0;
 	TCHAR ch;
-	for (int i = 0; i < offset; i++) {	//we dont care about stuff after the offset
+	for (DOCPOSITION i = 0; i < offset; i++) {	//we dont care about stuff after the offset
 		//tokenVector.push_back(pair(lineData+i, len));
 		ch = lineData[i];
 		if (ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' || ch == '_') {	//part of identifier
@@ -131,7 +131,7 @@ bool FunctionCallTip::getCursorFunction() {
 		}
 	}
 
-	int vsize = (int)tokenVector.size();
+	int vsize = static_cast<int>(tokenVector.size());
 	//mind nested funcs, like |blblb a (x, b(), c);|
 	//therefore, use stack
 	std::vector<FunctionValues> valueVec;

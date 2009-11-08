@@ -193,9 +193,9 @@ size_t Printer::doPrint(bool justDoIt)
 	}
 
 	// By default, we will print all the document
-	long lengthPrinted = 0;
-	long lengthDoc = _pSEView->getCurrentDocLen();
-	long lengthDocMax = lengthDoc;
+	DOCPOSITION lengthPrinted = 0;
+	DOCPOSITION lengthDoc = _pSEView->getCurrentDocLen();
+	DOCPOSITION lengthDocMax = lengthDoc;
 
 	// In the case that the print dialog was launched and that there's a range of selection
 	// We print the range of selection

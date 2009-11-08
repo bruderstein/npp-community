@@ -46,7 +46,7 @@ public:
 	void translateTab(int index, const TCHAR * newname);
 
 protected :
-	BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 
 private:
 	static const int maxTabName = 64;

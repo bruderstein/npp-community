@@ -59,7 +59,7 @@ void DockingDlgInterface::display( bool toShow /*= true*/ ) const
 	::SendMessage(_hParent, toShow?NPPM_DMMSHOW:NPPM_DMMHIDE, 0, (LPARAM)_hSelf);
 }
 
-BOOL CALLBACK DockingDlgInterface::run_dlgProc( UINT message, WPARAM /*wParam*/, LPARAM lParam )
+LRESULT CALLBACK DockingDlgInterface::run_dlgProc( UINT message, WPARAM /*wParam*/, LPARAM lParam )
 {
 	switch (message)
 	{

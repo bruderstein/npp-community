@@ -72,7 +72,7 @@ int TaskListDlg::doDialog( bool isRTL /*= false*/ )
 	return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_TASKLIST_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
 }
 
-BOOL CALLBACK TaskListDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK TaskListDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM lParam )
 {
 	switch (Message)
 	{
@@ -142,7 +142,7 @@ BOOL CALLBACK TaskListDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 		{
 			switch (((LPNMHDR)lParam)->code)
 			{
-				case LVN_GETDISPINFO:
+			case LVN_GETDISPINFO:
 				{
 					LV_ITEM &lvItem = reinterpret_cast<LV_DISPINFO*>((LV_DISPINFO FAR *)lParam)->item;
 
@@ -154,16 +154,16 @@ BOOL CALLBACK TaskListDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 					return TRUE;
 				}
 
-				case NM_CLICK :
-				case NM_RCLICK :
+			case NM_CLICK :
+			case NM_RCLICK :
 				{
 					assert(_taskList);
 					::SendMessage(_hSelf, WM_COMMAND, ID_PICKEDUP, _taskList->updateCurrentIndex());
 					return TRUE;
 				}
 
-				default:
-					break;
+			default:
+				break;
 			}
 			break;
 		}
@@ -194,7 +194,7 @@ BOOL CALLBACK TaskListDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 	return FALSE;
 }
 
-void TaskListDlg::drawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
+void TaskListDlg::drawItem( LPDRAWITEMSTRUCT lpDrawItemStruct )
 {
 	assert(_taskList);
 	RECT rect = lpDrawItemStruct->rcItem;

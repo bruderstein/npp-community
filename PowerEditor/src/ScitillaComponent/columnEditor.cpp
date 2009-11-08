@@ -29,9 +29,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define activeText true
 #define activeNumeric false
 
-void ColumnEditorDlg::init(HINSTANCE hInst, HWND hParent, ScintillaEditView **ppEditView)
+void ColumnEditorDlg::init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView)
 {
-	Window::init(hInst, hParent);
+	Window::init(hInst, hPere);
 	if (!ppEditView)
 		throw int(9900);
 	_ppEditView = ppEditView;
@@ -58,7 +58,7 @@ void ColumnEditorDlg::display(bool toShow) const
 		::SetFocus(::GetDlgItem(_hSelf, ID_GOLINE_EDIT));
 }
 
-BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM)
+LRESULT CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM)
 {
 	switch (message)
 	{
@@ -100,16 +100,14 @@ BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM)
 
 						display(false);
 
-						if ((*_ppEditView)->execute(SCI_SELECTIONISRECTANGLE) || (*_ppEditView)->execute(SCI_GETSELECTIONS) > 1)
+						if ((*_ppEditView)->execute(SCI_SELECTIONISRECTANGLE))
 						{
-							ColumnModeInfos colInfos = (*_ppEditView)->getColumnModeSelectInfo();
-							// It's all right here. It's used as intended.
-							//lint -e864 (Info -- Expression involving variable 'colInfos' possibly depends on order of evaluation)
-							std::sort(colInfos.begin(), colInfos.end(), SortInPositionOrder());
+							ColumnModeInfo colInfos = (*_ppEditView)->getColumnModeSelectInfo();
 							(*_ppEditView)->columnReplace(colInfos, str);
-							std::sort(colInfos.begin(), colInfos.end(), SortInSelectOrder());
-							(*_ppEditView)->setMultiSelections(colInfos);
-							//lint +e864
+							(*_ppEditView)->execute(SCI_SETCURRENTPOS,colInfos[colInfos.size()-1].second);
+
+							//(*_ppEditView)->execute(SCI_SETSEL, colInfos[0].first, colInfos[colInfos.size()-1].second);
+							//(*_ppEditView)->execute(SCI_SETSELECTIONMODE, 1);
 						}
 						else
 						{
@@ -162,16 +160,11 @@ BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM)
 						UCHAR format = getFormat();
 						display(false);
 
-						if ((*_ppEditView)->execute(SCI_SELECTIONISRECTANGLE) || (*_ppEditView)->execute(SCI_GETSELECTIONS) > 1)
+						if ((*_ppEditView)->execute(SCI_SELECTIONISRECTANGLE))
 						{
-							// It's all right here. It's used as intended.
-							//lint -e864 (Info -- Expression involving variable 'colInfos' possibly depends on order of evaluation)
-							ColumnModeInfos colInfos = (*_ppEditView)->getColumnModeSelectInfo();
-							std::sort(colInfos.begin(), colInfos.end(), SortInPositionOrder());
+							ColumnModeInfo colInfos = (*_ppEditView)->getColumnModeSelectInfo();
 							(*_ppEditView)->columnReplace(colInfos, initialNumber, increaseNumber, format);
-							std::sort(colInfos.begin(), colInfos.end(), SortInSelectOrder());
-							(*_ppEditView)->setMultiSelections(colInfos);
-							//lint +e864
+							(*_ppEditView)->execute(SCI_SETCURRENTPOS,colInfos[colInfos.size()-1].second);
 						}
 						else
 						{
@@ -219,9 +212,9 @@ BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM)
 								(*_ppEditView)->getGenericText(line, lineBegin, lineEnd);
 								generic_string s2r(line);
 
-								//
-								// Calcule generic_string
-								//
+								/*
+								Calcule generic_string
+								*/
 								int2str(str, stringSize, initialNumber, base, nb, isZeroLeading);
 								initialNumber += increaseNumber;
 
@@ -297,17 +290,4 @@ void ColumnEditorDlg::switchTo(bool toText)
 	::EnableWindow(::GetDlgItem(_hSelf, IDC_COL_LEADZERO_CHECK), !toText);
 
 	::SetFocus(toText?hText:hNum);
-}
-
-UCHAR ColumnEditorDlg::getFormat()
-{
-	bool isLeadingZeros = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_LEADZERO_CHECK, BM_GETCHECK, 0, 0));
-	UCHAR f = 0; // Dec by default
-	if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_HEX_RADIO, BM_GETCHECK, 0, 0))
-		f = 1;
-	else if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_OCT_RADIO, BM_GETCHECK, 0, 0))
-		f = 2;
-	else if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_BIN_RADIO, BM_GETCHECK, 0, 0))
-		f = 3;
-	return (f | (isLeadingZeros?MASK_ZERO_LEADING:0));
 }

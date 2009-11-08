@@ -34,7 +34,7 @@ public:
 protected:
 	CWinMgr* _winMgr;	  // window manager
 
-	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 	virtual BOOL onInitDialog();
 	virtual void onSize(UINT nType, int cx, int cy);
 	virtual void onGetMinMaxInfo(MINMAXINFO* lpMMI);

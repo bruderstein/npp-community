@@ -99,7 +99,7 @@ private :
     //bool _isSync;
 	bool _isShownGOCtrls;
 
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 
 	Style & getCurrentStyler();
 	int whichTabColourIndex();

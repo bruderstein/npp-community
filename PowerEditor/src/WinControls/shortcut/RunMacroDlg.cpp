@@ -63,7 +63,7 @@ int RunMacroDlg::getMacro2Exec() const
 	return isCurMacroPresent?(m_macroIndex - 1):m_macroIndex;
 }
 
-BOOL CALLBACK RunMacroDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
+LRESULT CALLBACK RunMacroDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (message)
 	{

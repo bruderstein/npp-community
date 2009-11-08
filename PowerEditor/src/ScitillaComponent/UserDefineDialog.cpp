@@ -55,7 +55,7 @@ public :
 	long doDialog();
 
 protected :
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/);
 
 private :
 	generic_string _title;
@@ -229,7 +229,7 @@ int FolderStyleDialog::getGroupIndexFromCombo(int ctrlID, bool & isFontSize) con
     }
 }
 
-BOOL CALLBACK SharedParametersDialog::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK SharedParametersDialog::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch (Message)
 	{
@@ -453,7 +453,7 @@ KeyWordsStyleDialog::KeyWordsStyleDialog() : SharedParametersDialog(4)
 }
 
 
-BOOL CALLBACK KeyWordsStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK KeyWordsStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch (Message)
 	{
@@ -482,7 +482,7 @@ BOOL CALLBACK KeyWordsStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LPAR
 		}
 		break;
 
-		default:
+		default :
 		break;
 	}
 	return SharedParametersDialog::run_dlgProc(Message, wParam, lParam);
@@ -667,7 +667,7 @@ CommentStyleDialog::CommentStyleDialog() : SharedParametersDialog(3)
 	memcpy(_fontNameCombo, fontNameCombo3, sizeof(fontNameCombo3));
 }
 
-BOOL CALLBACK CommentStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK CommentStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch (Message)
 	{
@@ -1182,7 +1182,7 @@ void SymbolsStyleDialog::listboxsInit()
 	}
 }
 
-BOOL CALLBACK SymbolsStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK SymbolsStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch (Message)
 	{
@@ -1467,7 +1467,7 @@ void UserDefineDialog::updateDlg()
 	_symbolsStyleDlg.updateDlg();
 }
 
-BOOL CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	switch (message)

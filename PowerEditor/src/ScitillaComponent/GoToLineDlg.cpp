@@ -20,7 +20,7 @@
 #include "ScintillaEditView.h"
 #include "resource.h"
 
-BOOL CALLBACK GoToLineDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
+LRESULT CALLBACK GoToLineDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (message)
 	{

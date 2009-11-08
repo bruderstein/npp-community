@@ -137,15 +137,15 @@ const bool L2R = true;
 const bool R2L = false;
 
 struct ColumnModeInfo {
-	int _selLpos;
-	int _selRpos;
+	DOCPOSITION _selLpos;
+	DOCPOSITION _selRpos;
 	int _order; // 0 based index
 	bool _direction; // L2R or R2L
 	int _nbVirtualCaretSpc;
 	int _nbVirtualAnchorSpc;
 
 	ColumnModeInfo() : _selLpos(0), _selRpos(0), _order(-1), _direction(L2R), _nbVirtualAnchorSpc(0), _nbVirtualCaretSpc(0){};
-	ColumnModeInfo(int lPos, int rPos, int order, bool dir = L2R, int vAnchorNbSpc = 0, int vCaretNbSpc = 0)
+	ColumnModeInfo(DOCPOSITION lPos, DOCPOSITION rPos, int order, bool dir = L2R, int vAnchorNbSpc = 0, int vCaretNbSpc = 0)
 		: _selLpos(lPos), _selRpos(rPos), _order(order), _direction(dir), _nbVirtualAnchorSpc(vAnchorNbSpc), _nbVirtualCaretSpc(vCaretNbSpc){};
 
 	bool isValid() const {
@@ -211,12 +211,12 @@ public:
 	char * getWordOnCaretPos(char * txt, int size);
 	TCHAR * getGenericWordOnCaretPos(TCHAR * txt, int size);
 	TCHAR * getGenericSelectedText(TCHAR * txt, int size, bool expand = true);
-	int searchInTarget(const TCHAR * Text2Find, int fromPos, int toPos) const;
+	DOCPOSITION searchInTarget(const TCHAR * Text2Find, DOCPOSITION fromPos, DOCPOSITION toPos) const;
 	void appandGenericText(const TCHAR * text2Append) const;
 	void addGenericText(const TCHAR * text2Append) const;
 	void addGenericText(const TCHAR * text2Append, long *mstart, long *mend) const;
-	int replaceTarget(const TCHAR * str2replace, DOCPOSITION fromTargetPos = -1, DOCPOSITION toTargetPos = -1) const;
-	int replaceTargetRegExMode(const TCHAR * re, DOCPOSITION fromTargetPos = -1, DOCPOSITION toTargetPos = -1) const;
+	DOCPOSITION replaceTarget(const TCHAR * str2replace, DOCPOSITION fromTargetPos = -1, DOCPOSITION toTargetPos = -1) const;
+	DOCPOSITION replaceTargetRegExMode(const TCHAR * re, DOCPOSITION fromTargetPos = -1, DOCPOSITION toTargetPos = -1) const;
 	void showAutoComletion(int lenEntered, const TCHAR * list);
 	void showCallTip(int startPos, const TCHAR * def);
 	void getLine(LINENUMBER lineNumber, TCHAR * line, int lineBufferLen);
@@ -227,26 +227,26 @@ public:
 	void saveCurrentFold();
 	void restoreCurrentFold();
 
-	int getCurrentDocLen() const;
+	DOCPOSITION getCurrentDocLen() const;
 	void getSelection(CharacterRange& range) const;
 	void getWordToCurrentPos(TCHAR * str, int strLen) const;
-	void doUserDefineDlg(bool willBeShown = true, bool isRTL = false);
+    void doUserDefineDlg(bool willBeShown = true, bool isRTL = false);
 	static UserDefineDialog * getUserDefineDlg();
-	void setCaretColorWidth(int color, int width = 1) const;
+    void setCaretColorWidth(int color, int width = 1) const;
 	void beSwitched();
 
-	//Marge member and method
-	static const int _SC_MARGE_LINENUMBER;
-	static const int _SC_MARGE_SYBOLE;
-	static const int _SC_MARGE_FOLDER;
+    //Marge member and method
+    static const int _SC_MARGE_LINENUMBER;
+    static const int _SC_MARGE_SYBOLE;
+    static const int _SC_MARGE_FOLDER;
 	//static const int _SC_MARGE_MODIFMARKER;
 
-	void showMargin(int whichMarge, bool willBeShowed = true);
-	bool hasMarginShowed(int witchMarge);
-	void marginClick(int position, int modifiers);
-	void setMakerStyle(folderStyle style);
+    void showMargin(int whichMarge, bool willBeShowed = true);
+    bool hasMarginShowed(int witchMarge);
+    void marginClick(int position, int modifiers);
+    void setMakerStyle(folderStyle style);
 
-	folderStyle getFolderStyle() {return _folderStyle;};
+    folderStyle getFolderStyle() {return _folderStyle;};
 	void showWSAndTab(bool willBeShowed = true);
 	void showEOL(bool willBeShowed = true);
 	bool isEolVisible();
@@ -262,10 +262,10 @@ public:
 	bool isMouseWheelZoomEnable() const;
 	void enableMouseWheelZoom(bool enable);
 
-	void wrap(bool willBeWrapped = true);
-	bool isWrap() const;
+    void wrap(bool willBeWrapped = true);
+    bool isWrap() const;
 	bool isWrapSymbolVisible() const;
-	void showWrapSymbol(bool willBeShown = true);
+    void showWrapSymbol(bool willBeShown = true);
 
 	long getCurrentLineNumber()const;
 	long lastZeroBasedLineNumber() const;
@@ -273,22 +273,22 @@ public:
 	long getCurrentXOffset()const;
 	void setCurrentXOffset(long xOffset);
 
-	void scroll(int column, LINENUMBER line);
+	void scroll(DOCPOSITION column, LINENUMBER line);
 
 	long getCurrentPointX()const;
 	long getCurrentPointY()const;
 
 	long getTextHeight()const;
 
-	void gotoLine(int line);
+	void gotoLine(LINENUMBER line);
 
-	long getCurrentColumnNumber() const;
+	DOCPOSITION getCurrentColumnNumber() const;
 
-	long getSelectedByteNumber() const;
+	DOCPOSITION getSelectedByteNumber() const;
 
-	long getLineLength(int line) const;
-	long getLineIndent(int line) const;
-	void setLineIndent(int line, int indent) const;
+	DOCPOSITION getLineLength(LINENUMBER line) const;
+	long getLineIndent(LINENUMBER line) const;
+	void setLineIndent(LINENUMBER line, DOCPOSITION indent) const;
 
 	void showLineNumbersMargin(bool show);
 
@@ -299,7 +299,7 @@ public:
 
 	void performGlobalStyles();
 
-	void expand(int &line, bool doExpand, bool force = false, int visLevels = 0, int level = -1);
+	void expand(LINENUMBER &line, bool doExpand, bool force = false, int visLevels = 0, int level = -1);
 
 	void currentLineUp() const;
 	void currentLineDown() const;
@@ -310,8 +310,8 @@ public:
 
 	void convertSelectedTextTo(bool Case);
 	void setMultiSelections(const ColumnModeInfos & cmi);
-	void convertSelectedTextToLowerCase();
-	void convertSelectedTextToUpperCase();
+    void convertSelectedTextToLowerCase();
+    void convertSelectedTextToUpperCase();
 
 	void collapse(int level2Collapse, bool mode);
 	void foldAll(bool mode);
@@ -327,7 +327,7 @@ public:
 	void columnReplace(ColumnModeInfos & cmi, const TCHAR *str);
 	void columnReplace(ColumnModeInfos & cmi, int initial, int incr, UCHAR format);
 
-	void foldChanged(int line, int levelNow, int levelPrev);
+	void foldChanged(LINENUMBER line, int levelNow, int levelPrev);
 	void clearIndicator(int indicatorNumber);
 
 	static LanguageName ScintillaEditView::langNames[L_EXTERNAL+1];
@@ -350,7 +350,7 @@ protected:
 	static HINSTANCE _hLib;
 	static int _refCount;
 
-	static const int _markersArray[][NB_FOLDER_STATE];
+    static const int _markersArray[][NB_FOLDER_STATE];
 
 	static LRESULT CALLBACK scintillaStatic_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
@@ -366,7 +366,7 @@ protected:
 	BufferID _currentBufferID;
 	Buffer * _currentBuffer;
 	folderStyle _folderStyle;
-	NppParameters *_pParameter;
+    NppParameters *_pParameter;
 	int _codepage;
 	int _oemCodepage;
 	bool _lineNumbersShown;
@@ -403,12 +403,12 @@ protected:
 	void setXmlLexer(LangType type);
 	void setCppLexer(LangType type);
 	void setTclLexer();
-	void setObjCLexer(LangType type);
+    void setObjCLexer(LangType type);
 	void setUserLexer(const TCHAR *userLangName = NULL);
 	void setExternalLexer(LangType typeDoc);
 	void setEmbeddedJSLexer();
-	void setPhpEmbeddedLexer();
-	void setEmbeddedAspLexer();
+    void setPhpEmbeddedLexer();
+    void setEmbeddedAspLexer();
 
 	//Simple lexers
 	void setCssLexer();
@@ -448,14 +448,14 @@ protected:
 	bool isNeededFolderMarge(LangType typeDoc) const;
 //END: Lexers and Styling
 
-	void defineMarker(int marker, int markerType, COLORREF fore, COLORREF back);
+    void defineMarker(int marker, int markerType, COLORREF fore, COLORREF back);
 
 	bool isCJK() const;
 
 	int codepage2CharSet() const;
 
-	void setTabSettings(Lang *lang);
-	std::pair<int, int> getWordRange();
+    void setTabSettings(Lang *lang);
+	std::pair<DOCPOSITION, DOCPOSITION> getWordRange();
 	bool expandWordSelection();
 
 private:

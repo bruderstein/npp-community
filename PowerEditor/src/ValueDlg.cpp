@@ -72,7 +72,7 @@ int ValueDlg::reSizeValueBox()
 	return extraSize;
 }
 
-BOOL CALLBACK ValueDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM /*lParam*/ )
+LRESULT CALLBACK ValueDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM /*lParam*/ )
 {
 	switch (Message)
 	{

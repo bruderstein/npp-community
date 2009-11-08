@@ -79,7 +79,7 @@ public:
 
 protected :
 	KeyCombo _keyCombo;
-	virtual BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 	bool _canModifyName;
 	TCHAR _name[nameLenMax];		//normal name is plain text (for display purposes)
 	TCHAR _menuName[nameLenMax];	//menu name has ampersands for quick keys
@@ -133,7 +133,7 @@ private:
 	void showCurrentSettings();
 	void updateListItem(int index);
 protected :
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
 
 

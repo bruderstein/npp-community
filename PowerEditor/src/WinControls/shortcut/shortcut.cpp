@@ -373,7 +373,7 @@ void getNameStrFromCmd(INT cmd, generic_string & str)
 	return;
 }
 
-BOOL CALLBACK Shortcut::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
+LRESULT CALLBACK Shortcut::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (Message)
 	{
@@ -835,7 +835,7 @@ void ScintillaKeyMap::updateListItem(int index) {
 	::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_DELETESTRING, index+1, 0);
 }
 
-BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
+LRESULT CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 
 	switch (Message)

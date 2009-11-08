@@ -215,7 +215,7 @@ void WindowsDlg::init(HINSTANCE hInst, HWND parent)
 	_pTab = NULL;
 }
 
-BOOL CALLBACK WindowsDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WindowsDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{

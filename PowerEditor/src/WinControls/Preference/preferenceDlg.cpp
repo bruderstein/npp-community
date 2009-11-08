@@ -55,7 +55,7 @@ private :
 	bool isCheckedOrNot(int checkControlID) const {
 		return (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, checkControlID), BM_GETCHECK, 0, 0));
 	};
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
 
 class BarsDlg : public StaticDialog
@@ -63,7 +63,7 @@ class BarsDlg : public StaticDialog
 public :
 	BarsDlg() {}
 private :
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
 
 class MarginsDlg : public StaticDialog
@@ -81,7 +81,7 @@ public :
 
 private :
 	URLCtrl _verticalEdgeLineNbColVal;
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 	void changePanelTo(int index);
 };
 
@@ -103,7 +103,7 @@ private :
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_OPENANSIASUTF8, BM_SETCHECK, BST_UNCHECKED, 0);
 		::EnableWindow(::GetDlgItem(_hSelf, IDC_CHECK_OPENANSIASUTF8), doIt);
 	};
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
 
 class LangMenuDlg : public StaticDialog
@@ -113,7 +113,7 @@ public :
 private :
 	URLCtrl _tabSizeVal;
 	LexerStylerArray _lsArray;
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 	std::vector<LangMenuItem> _langList;
 };
 
@@ -132,7 +132,7 @@ public :
 		_selEnd(0)
 	{}
 private :
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 	std::vector<strCouple> varList;
 	int _focusedEditCtrl;
 	DWORD _selStart;
@@ -155,7 +155,7 @@ public :
 private :
 	URLCtrl _nbCharVal;
 	void updateBackupGUI();
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
 
 struct PreferenceDlgWindows
@@ -245,7 +245,7 @@ void PreferenceDlg::destroy()
 }
 
 
-BOOL CALLBACK PreferenceDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK PreferenceDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch (Message)
 	{
@@ -352,7 +352,7 @@ BOOL CALLBACK PreferenceDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPa
 	return FALSE;
 }
 
-BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
+LRESULT CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	switch (Message)
@@ -601,7 +601,7 @@ void MarginsDlg::changePanelTo(int index)
 
 }
 
-BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
+LRESULT CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
@@ -777,7 +777,7 @@ BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPar
 	return FALSE;
 }
 
-BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
+LRESULT CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
@@ -1070,7 +1070,7 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 	return FALSE;
 }
 
-BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
+LRESULT CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI & )pNppParam->getNppGUI();
@@ -1270,7 +1270,7 @@ BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 	return FALSE;
 }
 
-BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI & )pNppParam->getNppGUI();
@@ -1645,7 +1645,7 @@ void trim(generic_string & str)
 	}
 };
 
-BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM)
+LRESULT CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI & )pNppParam->getNppGUI();
@@ -1781,47 +1781,47 @@ BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM)
 
 					default :
 					{
-						const int stringSize = 256;
-						TCHAR str[stringSize];
-						_focusedEditCtrl = LOWORD(wParam);
-						::GetDlgItemText(_hSelf, _focusedEditCtrl, str, stringSize);
-						::SendDlgItemMessage(_hSelf, IDC_VIEWPANEL_STATIC, WM_SETTEXT, 0, (LPARAM)str);
-						switch (LOWORD(wParam))
-						{
-							case  IDC_EDIT_HLEFT:
-								nppGUI._printSettings._headerLeft = str;
-								trim(nppGUI._printSettings._headerLeft);
-								return TRUE;
+				const int stringSize = 256;
+				TCHAR str[stringSize];
+				_focusedEditCtrl = LOWORD(wParam);
+				::GetDlgItemText(_hSelf, _focusedEditCtrl, str, stringSize);
+				::SendDlgItemMessage(_hSelf, IDC_VIEWPANEL_STATIC, WM_SETTEXT, 0, (LPARAM)str);
+				switch (LOWORD(wParam))
+				{
+					case  IDC_EDIT_HLEFT:
+						nppGUI._printSettings._headerLeft = str;
+						trim(nppGUI._printSettings._headerLeft);
+						return TRUE;
 
-							case  IDC_EDIT_HMIDDLE:
-								nppGUI._printSettings._headerMiddle = str;
-								trim(nppGUI._printSettings._headerMiddle);
-								return TRUE;
+					case  IDC_EDIT_HMIDDLE:
+						nppGUI._printSettings._headerMiddle = str;
+						trim(nppGUI._printSettings._headerMiddle);
+						return TRUE;
 
-							case IDC_EDIT_HRIGHT :
-								nppGUI._printSettings._headerRight = str;
-								trim(nppGUI._printSettings._headerRight);
-								return TRUE;
+					case IDC_EDIT_HRIGHT :
+						nppGUI._printSettings._headerRight = str;
+						trim(nppGUI._printSettings._headerRight);
+						return TRUE;
 
-							case  IDC_EDIT_FLEFT:
-								nppGUI._printSettings._footerLeft = str;
-								trim(nppGUI._printSettings._footerLeft);
-								return TRUE;
+					case  IDC_EDIT_FLEFT:
+						nppGUI._printSettings._footerLeft = str;
+						trim(nppGUI._printSettings._footerLeft);
+						return TRUE;
 
-							case  IDC_EDIT_FMIDDLE:
-								nppGUI._printSettings._footerMiddle = str;
-								trim(nppGUI._printSettings._footerMiddle);
-								return TRUE;
+					case  IDC_EDIT_FMIDDLE:
+						nppGUI._printSettings._footerMiddle = str;
+						trim(nppGUI._printSettings._footerMiddle);
+						return TRUE;
 
-							case IDC_EDIT_FRIGHT :
-								nppGUI._printSettings._footerRight = str;
-								trim(nppGUI._printSettings._footerRight);
-								return TRUE;
+					case IDC_EDIT_FRIGHT :
+						nppGUI._printSettings._footerRight = str;
+						trim(nppGUI._printSettings._footerRight);
+						return TRUE;
 
-							default :
-								return FALSE;
-						}
-					}
+					default :
+						return FALSE;
+				}
+			}
 				}
 			}
 			else if (HIWORD(wParam) == EN_SETFOCUS)
@@ -2008,7 +2008,7 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 }
 */
 
-BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
+LRESULT CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();

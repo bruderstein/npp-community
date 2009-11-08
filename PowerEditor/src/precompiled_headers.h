@@ -88,4 +88,7 @@
 
 #include "Debug/npp_debug.h"
 
+// Line number and Doc positions
+#include "NumberTypes.h"
+
 #endif // PRECOMPILED_HEADERS_H

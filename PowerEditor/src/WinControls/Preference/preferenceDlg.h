@@ -39,7 +39,7 @@ public :
 	virtual void destroy();
 
 private :
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 	ControlsTab* _ctrlTab;
 	PreferenceDlgWindows* _wVector;
 

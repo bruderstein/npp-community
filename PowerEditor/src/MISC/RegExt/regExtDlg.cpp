@@ -55,7 +55,7 @@ void RegExtDlg::doDialog(bool isRTL)
 		::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_REGEXT_BOX), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
 };
 
-BOOL CALLBACK RegExtDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK RegExtDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch (Message)
 	{

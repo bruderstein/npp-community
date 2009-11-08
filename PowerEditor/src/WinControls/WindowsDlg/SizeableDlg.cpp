@@ -54,7 +54,7 @@ LRESULT SizeableDlg::onWinMgr(WPARAM /*wp*/, LPARAM /*lp*/)
 	return 0;
 }
 
-BOOL CALLBACK SizeableDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK SizeableDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{

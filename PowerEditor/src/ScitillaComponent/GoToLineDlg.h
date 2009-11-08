@@ -40,7 +40,7 @@ public :
 protected :
 	enum mode {go2line, go2offsset};
 	mode _mode;
-	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 
 private :
 

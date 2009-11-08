@@ -55,7 +55,7 @@ public :
     int doDialog(bool isRTL = false);
 
 protected :
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 
 private :
 	TaskList* _taskList;

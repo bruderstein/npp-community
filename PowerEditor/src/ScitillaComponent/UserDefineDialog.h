@@ -60,7 +60,7 @@ protected :
 	int _fontSizeCombo[maxNbGroup];
 	int _fontNameCombo[maxNbGroup];
 
-    BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
     void initControls();
 	void styleUpdate(const Style & style, ColourPicker *pFgColourPicker, ColourPicker *pBgColourPicker,
 					 int fontComboId, int fontSizeComboId, int boldCheckId, int italicCheckId, int underlineCheckId);
@@ -93,7 +93,7 @@ public:
 	void updateDlg();
 
 protected :
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 	void setKeywords2List(int id);
 
     // SEE @REF #01
@@ -109,7 +109,7 @@ public :
     void updateDlg();
 protected :
 
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 
     void setKeywords2List(int id);
     int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const;
@@ -132,7 +132,7 @@ public :
 	void undeleteChar();
 
 protected :
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
     void setKeywords2List(int /*ctrlID*/) {}
     int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const;
     int getStylerIndexFromCP(HWND hWnd, bool & isFG, ColourPicker **ppCP) const;
@@ -222,7 +222,7 @@ public :
 		_ctrlTab.renameTab(index, name2set);
 	};
 protected :
-	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 
 private :
 	ControlsTab _ctrlTab;

@@ -42,7 +42,7 @@ public :
 	int getMacro2Exec() const;
 
 private :
-	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 
 	bool isCheckedOrNot(int checkControlID) const;
 
