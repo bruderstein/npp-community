@@ -1210,7 +1210,7 @@ LRESULT CALLBACK SymbolsStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LP
 			}
 			else if (wParam == IDC_HAS_ESCAPE)
 			{
-				int newState = ::SendDlgItemMessage(_hSelf,IDC_HAS_ESCAPE, BM_GETCHECK, 0, 0);
+				int newState = static_cast<int>(::SendDlgItemMessage(_hSelf,IDC_HAS_ESCAPE, BM_GETCHECK, 0, 0));
 				::EnableWindow(::GetDlgItem(_hSelf, IDC_ESCAPE_CHAR), (newState == BST_CHECKED) ? TRUE : FALSE);
 				if ((newState == BST_CHECKED) && !::SendDlgItemMessage(_hSelf, IDC_ESCAPE_CHAR, WM_GETTEXTLENGTH, 0, 0) && (_lastEscapeChar != 0))
 				//restore previous char
@@ -1902,7 +1902,7 @@ int UserDefineDialog::getNbKeywordList()
 	return KWL_NB_KEYWORD_LISTS;
 }
 
-BOOL CALLBACK StringDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM)
+LRESULT CALLBACK StringDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM)
 {
 
 	switch (Message)

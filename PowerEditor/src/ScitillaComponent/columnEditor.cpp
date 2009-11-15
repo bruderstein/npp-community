@@ -102,9 +102,9 @@ LRESULT CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARA
 
 						if ((*_ppEditView)->execute(SCI_SELECTIONISRECTANGLE))
 						{
-							ColumnModeInfo colInfos = (*_ppEditView)->getColumnModeSelectInfo();
+							ColumnModeInfos colInfos = (*_ppEditView)->getColumnModeSelectInfo();
 							(*_ppEditView)->columnReplace(colInfos, str);
-							(*_ppEditView)->execute(SCI_SETCURRENTPOS,colInfos[colInfos.size()-1].second);
+							(*_ppEditView)->execute(SCI_SETCURRENTPOS,colInfos[colInfos.size()-1]._selRpos);
 
 							//(*_ppEditView)->execute(SCI_SETSEL, colInfos[0].first, colInfos[colInfos.size()-1].second);
 							//(*_ppEditView)->execute(SCI_SETSELECTIONMODE, 1);
@@ -162,9 +162,9 @@ LRESULT CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARA
 
 						if ((*_ppEditView)->execute(SCI_SELECTIONISRECTANGLE))
 						{
-							ColumnModeInfo colInfos = (*_ppEditView)->getColumnModeSelectInfo();
+							ColumnModeInfos colInfos = (*_ppEditView)->getColumnModeSelectInfo();
 							(*_ppEditView)->columnReplace(colInfos, initialNumber, increaseNumber, format);
-							(*_ppEditView)->execute(SCI_SETCURRENTPOS,colInfos[colInfos.size()-1].second);
+							(*_ppEditView)->execute(SCI_SETCURRENTPOS,colInfos[colInfos.size()-1]._selRpos);
 						}
 						else
 						{
@@ -290,4 +290,17 @@ void ColumnEditorDlg::switchTo(bool toText)
 	::EnableWindow(::GetDlgItem(_hSelf, IDC_COL_LEADZERO_CHECK), !toText);
 
 	::SetFocus(toText?hText:hNum);
+}
+
+UCHAR ColumnEditorDlg::getFormat()
+{
+	bool isLeadingZeros = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_LEADZERO_CHECK, BM_GETCHECK, 0, 0));
+	UCHAR f = 0; // Dec by default
+	if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_HEX_RADIO, BM_GETCHECK, 0, 0))
+		f = 1;
+	else if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_OCT_RADIO, BM_GETCHECK, 0, 0))
+		f = 2;
+	else if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_BIN_RADIO, BM_GETCHECK, 0, 0))
+		f = 3;
+	return (f | (isLeadingZeros?MASK_ZERO_LEADING:0));
 }

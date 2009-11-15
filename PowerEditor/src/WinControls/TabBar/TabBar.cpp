@@ -185,7 +185,7 @@ void TabBar::getCurrentTitle(TCHAR *title, int titleLen)
 
 int TabBar::getCurrentTabIndex() const
 {
-	return ::SendMessage(_hSelf, TCM_GETCURSEL, 0, 0);
+	return static_cast<int>(::SendMessage(_hSelf, TCM_GETCURSEL, 0, 0));
 }
 
 void TabBar::setFont(TCHAR *fontName, int fontSize)
@@ -422,7 +422,7 @@ void TabBarPlus::doOwnerDrawTab()
 	{
 		if (_hwndArray[i])
 		{
-			DWORD style = ::GetWindowLongPtr(_hwndArray[i], GWL_STYLE);
+			LONG_PTR style = ::GetWindowLongPtr(_hwndArray[i], GWL_STYLE);
 			if (isOwnerDrawTab())
 				style |= TCS_OWNERDRAWFIXED;
 			else

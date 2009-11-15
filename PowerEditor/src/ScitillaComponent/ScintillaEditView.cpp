@@ -1650,13 +1650,13 @@ void ScintillaEditView::replaceSelWith(const char * replaceText)
 	execute(SCI_REPLACESEL, 0, (WPARAM)replaceText);
 }
 
-char * ScintillaEditView::getWordFromRange(char * txt, int size, int pos1, int pos2)
+char * ScintillaEditView::getWordFromRange(char * txt, int size, DOCPOSITION pos1, DOCPOSITION pos2)
 {
     if (!size)
 		return NULL;
     if (pos1 > pos2)
     {
-        int tmp = pos1;
+        DOCPOSITION tmp = pos1;
         pos1 = pos2;
         pos2 = tmp;
     }
@@ -1673,7 +1673,7 @@ char * ScintillaEditView::getWordOnCaretPos(char * txt, int size)
     if (!size)
 		return NULL;
 
-    std::pair<int,int> range = getWordRange();
+    std::pair<DOCPOSITION, DOCPOSITION> range = getWordRange();
     return getWordFromRange(txt, size, range.first, range.second);
 }
 
@@ -1681,7 +1681,7 @@ TCHAR * ScintillaEditView::getGenericWordOnCaretPos(TCHAR * txt, int size)
 {
 #ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
-	unsigned int cp = execute(SCI_GETCODEPAGE);
+	unsigned int cp = static_cast<int>(execute(SCI_GETCODEPAGE));
 	char *txtA = new char[size + 1];
 	getWordOnCaretPos(txtA, size);
 
@@ -2114,8 +2114,8 @@ void ScintillaEditView::setMultiSelections(const ColumnModeInfos & cmi)
 	{
 		if (cmi[i].isValid())
 		{
-			int selStart = cmi[i]._direction == L2R?cmi[i]._selLpos:cmi[i]._selRpos;
-			int selEnd   = cmi[i]._direction == L2R?cmi[i]._selRpos:cmi[i]._selLpos;
+			DOCPOSITION selStart = cmi[i]._direction == L2R?cmi[i]._selLpos:cmi[i]._selRpos;
+			DOCPOSITION selEnd   = cmi[i]._direction == L2R?cmi[i]._selRpos:cmi[i]._selLpos;
 			execute(SCI_SETSELECTIONNSTART, i, selStart);
 			execute(SCI_SETSELECTIONNEND, i, selEnd);
 		}
@@ -2131,7 +2131,7 @@ void ScintillaEditView::setMultiSelections(const ColumnModeInfos & cmi)
 
 void ScintillaEditView::currentLineUp() const
 {
-	int currentLine = getCurrentLineNumber();
+	LINENUMBER currentLine = getCurrentLineNumber();
 	if (currentLine != 0)
 	{
 		execute(SCI_BEGINUNDOACTION);
@@ -2144,7 +2144,7 @@ void ScintillaEditView::currentLineUp() const
 
 void ScintillaEditView::currentLineDown() const
 {
-	int currentLine = getCurrentLineNumber();
+	LINENUMBER currentLine = getCurrentLineNumber();
 	if (currentLine != (execute(SCI_GETLINECOUNT) - 1))
 	{
 		execute(SCI_BEGINUNDOACTION);
@@ -2156,13 +2156,13 @@ void ScintillaEditView::currentLineDown() const
 }
 
 
-std::pair<int, int> ScintillaEditView::getSelectionLinesRange() const
+std::pair<LINENUMBER, LINENUMBER> ScintillaEditView::getSelectionLinesRange() const
 {
-    std::pair<int, int> range(-1, -1);
+    std::pair<LINENUMBER, LINENUMBER> range(-1, -1);
     if (execute(SCI_GETSELECTIONS) > 1)
         return range;
-    int start = execute(SCI_GETSELECTIONSTART);
-    int end = execute(SCI_GETSELECTIONEND);
+    DOCPOSITION start = execute(SCI_GETSELECTIONSTART);
+    DOCPOSITION end = execute(SCI_GETSELECTIONEND);
 
     range.first = execute(SCI_LINEFROMPOSITION, start);
     range.second = execute(SCI_LINEFROMPOSITION, end);
@@ -2173,23 +2173,23 @@ std::pair<int, int> ScintillaEditView::getSelectionLinesRange() const
 
 void ScintillaEditView::currentLinesUp() const
 {
-	std::pair<int, int> lineRange = getSelectionLinesRange();
+	std::pair<LINENUMBER, LINENUMBER> lineRange = getSelectionLinesRange();
     if ((lineRange.first == -1 || lineRange.first == 0))
         return;
 
 	bool noSel = lineRange.first == lineRange.second;
-    int nbSelLines = lineRange.second - lineRange.first + 1;
+    LINENUMBER nbSelLines = lineRange.second - lineRange.first + 1;
 
-    int line2swap = lineRange.first - 1;
-    int nbChar = execute(SCI_LINELENGTH, line2swap);
+    LINENUMBER line2swap = lineRange.first - 1;
+    DOCPOSITION nbChar = execute(SCI_LINELENGTH, line2swap);
 
-    int posStart = execute(SCI_POSITIONFROMLINE, lineRange.first);
-    int posEnd = execute(SCI_GETLINEENDPOSITION, lineRange.second);
+    DOCPOSITION posStart = execute(SCI_POSITIONFROMLINE, lineRange.first);
+    DOCPOSITION posEnd = execute(SCI_GETLINEENDPOSITION, lineRange.second);
 
     execute(SCI_BEGINUNDOACTION);
     execute(SCI_GOTOLINE, line2swap);
 
-    for (int i = 0 ; i < nbSelLines ; i++)
+    for (LINENUMBER i = 0 ; i < nbSelLines ; i++)
     {
         currentLineDown();
     }
@@ -2201,24 +2201,24 @@ void ScintillaEditView::currentLinesUp() const
 
 void ScintillaEditView::currentLinesDown() const
 {
-	std::pair<int, int> lineRange = getSelectionLinesRange();
+	std::pair<LINENUMBER, LINENUMBER> lineRange = getSelectionLinesRange();
 
 	if ((lineRange.first == -1 || lineRange.second >= execute(SCI_LINEFROMPOSITION, getCurrentDocLen())))
         return;
 
 	bool noSel = lineRange.first == lineRange.second;
-    int nbSelLines = lineRange.second - lineRange.first + 1;
+    LINENUMBER nbSelLines = lineRange.second - lineRange.first + 1;
 
-	int line2swap = lineRange.second + 1;
-    int nbChar = execute(SCI_LINELENGTH, line2swap);
+	LINENUMBER line2swap = lineRange.second + 1;
+    DOCPOSITION nbChar = execute(SCI_LINELENGTH, line2swap);
 
-	int posStart = execute(SCI_POSITIONFROMLINE, lineRange.first);
-    int posEnd = execute(SCI_GETLINEENDPOSITION, lineRange.second);
+	DOCPOSITION posStart = execute(SCI_POSITIONFROMLINE, lineRange.first);
+    DOCPOSITION posEnd = execute(SCI_GETLINEENDPOSITION, lineRange.second);
 
     execute(SCI_BEGINUNDOACTION);
     execute(SCI_GOTOLINE, line2swap);
 
-    for (int i = 0 ; i < nbSelLines ; i++)
+    for (LINENUMBER i = 0 ; i < nbSelLines ; i++)
     {
         currentLineUp();
     }
@@ -2247,7 +2247,9 @@ void ScintillaEditView::convertSelectedTextTo(bool Case)
 
        for (size_t i = 0 ; i < cmi.size() ; i++)
        {
-		   const int len = cmi[i]._selRpos - cmi[i]._selLpos;
+		   const DOCPOSITION longLen = cmi[i]._selRpos - cmi[i]._selLpos;
+		   assert(longLen == static_cast<int>(longLen));
+		   const int len = static_cast<int>(longLen);
 		   char *srcStr = new char[len+1];
 		   wchar_t *destStr = new wchar_t[len+1];
 
@@ -2405,15 +2407,16 @@ ColumnModeInfos ScintillaEditView::getColumnModeSelectInfo()
 	{
 	ColumnModeInfos columnModeInfos;
 	if (execute(SCI_GETSELECTIONS) > 1) // Multi-Selection || Column mode
-		{
-		int nbSel = execute(SCI_GETSELECTIONS);
+	{
+		assert(execute(SCI_GETSELECTIONS) == static_cast<int>(execute(SCI_GETSELECTIONS)));
+		int nbSel = static_cast<int>(execute(SCI_GETSELECTIONS));
 
 		for (int i = 0 ; i < nbSel ; i++)
 		{
 			DOCPOSITION absPosSelStartPerLine = execute(SCI_GETSELECTIONNANCHOR, i);
 			DOCPOSITION absPosSelEndPerLine = execute(SCI_GETSELECTIONNCARET, i);
-			DOCPOSITION nbVirtualAnchorSpc = execute(SCI_GETSELECTIONNANCHORVIRTUALSPACE, i);
-			DOCPOSITION nbVirtualCaretSpc = execute(SCI_GETSELECTIONNCARETVIRTUALSPACE, i);
+			int nbVirtualAnchorSpc = static_cast<int>(execute(SCI_GETSELECTIONNANCHORVIRTUALSPACE, i));
+			int nbVirtualCaretSpc = static_cast<int>(execute(SCI_GETSELECTIONNCARETVIRTUALSPACE, i));
 
 			if (absPosSelStartPerLine == absPosSelEndPerLine && execute(SCI_SELECTIONISRECTANGLE))
 			{
@@ -2437,7 +2440,7 @@ void ScintillaEditView::columnReplace(ColumnModeInfos & cmi, const TCHAR *str)
 		if (cmi[i].isValid())
 		{
 			DOCPOSITION len2beReplace = cmi[i]._selRpos - cmi[i]._selLpos;
-			int diff = lstrlen(str) - len2beReplace;
+			int diff = static_cast<int>(lstrlen(str) - len2beReplace);
 
 			cmi[i]._selLpos += totalDiff;
 			cmi[i]._selRpos += totalDiff;
@@ -2445,7 +2448,7 @@ void ScintillaEditView::columnReplace(ColumnModeInfos & cmi, const TCHAR *str)
 
 			if (hasVirtualSpc) // if virtual space is present, then insert space
 			{
-				for (int j = 0, k = cmi[i]._selLpos; j < cmi[i]._nbVirtualCaretSpc ; j++, k++)
+				for (DOCPOSITION j = 0, k = cmi[i]._selLpos; j < cmi[i]._nbVirtualCaretSpc ; j++, k++)
 				{
 					execute(SCI_INSERTTEXT, k, (LPARAM)" ");
 				}
@@ -2514,13 +2517,13 @@ void ScintillaEditView::columnReplace(ColumnModeInfos & cmi, int initial, int in
 	const int stringSize = 512;
 	TCHAR str[stringSize];
 
-	int totalDiff = 0;
+	DOCPOSITION totalDiff = 0;
 	for (size_t i = 0 ; i < cmi.size() ; i++)
 	{
 		if (cmi[i].isValid())
 		{
 			DOCPOSITION len2beReplace = cmi[i]._selRpos - cmi[i]._selLpos;
-			int diff = nb - len2beReplace;
+			DOCPOSITION diff = nb - len2beReplace;
 
 			cmi[i]._selLpos += totalDiff;
 			cmi[i]._selRpos += totalDiff;

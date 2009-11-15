@@ -1498,13 +1498,13 @@ void DockingCont::SetMaxItemWidth(const generic_string& maxString, const HDC& co
 {
 	SIZE size = {0};
 
-	GetTextExtentPoint32(context, maxString.c_str(), maxString.length(), &size);
+	GetTextExtentPoint32(context, maxString.c_str(), static_cast<int>(maxString.length()), &size);
 	_maxTabWidth = size.cx;
 
 	if (((tTbData*)tcItem.lParam)->uMask & DWS_ICONTAB)
 	{
 		HIMAGELIST	hImageList	= (HIMAGELIST)::SendMessage(_hParent, DMM_GETIMAGELIST, 0, 0);
-		int			iPosImage	= ::SendMessage(_hParent, DMM_GETICONPOS, 0, (LPARAM)((tTbData*)tcItem.lParam)->hClient);
+		int			iPosImage	= static_cast<int>(::SendMessage(_hParent, DMM_GETICONPOS, 0, (LPARAM)((tTbData*)tcItem.lParam)->hClient));
 
 		if ((hImageList != NULL) && (iPosImage >= 0))
 		{

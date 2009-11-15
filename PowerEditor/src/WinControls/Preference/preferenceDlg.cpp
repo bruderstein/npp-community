@@ -1345,7 +1345,7 @@ LRESULT CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lP
 			        POINT p;
 			        ::GetCursorPos(&p);//::GetParent(::GetParent(_hParent))
                     //::ScreenToClient(NULL, &p);
-			        int size = tabSizeDlg.doDialog(p);
+			        INT_PTR size = tabSizeDlg.doDialog(p);
 			        if (size == -1) return FALSE;
 
 					TCHAR nbStr[10];
@@ -1353,21 +1353,23 @@ LRESULT CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lP
 					::SetWindowText(::GetDlgItem(_hSelf, IDC_TABSIZEVAL_STATIC), nbStr);
                     ::SetWindowText(::GetDlgItem(_hSelf, IDC_TABSIZEVAL_DISABLE_STATIC), nbStr);
 
-                    int index = ::SendDlgItemMessage(_hSelf, IDC_LIST_TABSETTNG, LB_GETCURSEL, 0, 0);
+                    int index = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_LIST_TABSETTNG, LB_GETCURSEL, 0, 0));
                     if (index == LB_ERR) return FALSE;
 
                     if (index != 0)
                     {
                         Lang *lang = pNppParam->getLangFromIndex(index - 1);
                         if (!lang) return FALSE;
-                        lang->_tabSize = size;
+						assert(size == static_cast<int>(size));
+                        lang->_tabSize = static_cast<int>(size);
 
                         // write in langs.xml
                         pNppParam->insertTabInfo(lang->getLangName(), lang->getTabInfo());
                     }
                     else
                     {
-                        nppGUI._tabSize = size;
+						assert(size == static_cast<int>(size));
+                        nppGUI._tabSize = static_cast<int>(size);
                     }
 
                     ::SendMessage(_hParent, WM_COMMAND, IDM_SETTING_TAB_SIZE, 0);
@@ -1377,7 +1379,7 @@ LRESULT CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lP
 				case IDC_CHECK_REPLACEBYSPACE:
                 {
                     bool isTabReplacedBySpace = BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, IDC_CHECK_REPLACEBYSPACE), BM_GETCHECK, 0, 0);
-                    int index = ::SendDlgItemMessage(_hSelf, IDC_LIST_TABSETTNG, LB_GETCURSEL, 0, 0);
+                    int index = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_LIST_TABSETTNG, LB_GETCURSEL, 0, 0));
                     if (index == LB_ERR) return FALSE;
                     if (index != 0)
                     {
@@ -1402,7 +1404,7 @@ LRESULT CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lP
                 {
                     if (HIWORD(wParam) == LBN_SELCHANGE)
                     {
-                        int index = ::SendDlgItemMessage(_hSelf, IDC_LIST_TABSETTNG, LB_GETCURSEL, 0, 0);
+                        int index = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_LIST_TABSETTNG, LB_GETCURSEL, 0, 0));
 	                    if (index == LB_ERR)
 		                    return FALSE;
                         ::ShowWindow(::GetDlgItem(_hSelf, IDC_GR_TABVALUE_STATIC), index?SW_SHOW:SW_HIDE);
@@ -1455,7 +1457,7 @@ LRESULT CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lP
                 case IDC_CHECK_DEFAULTTABVALUE:
                 {
                     bool useDefaultTab = BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, IDC_CHECK_DEFAULTTABVALUE), BM_GETCHECK, 0, 0);
-                    int index = ::SendDlgItemMessage(_hSelf, IDC_LIST_TABSETTNG, LB_GETCURSEL, 0, 0);
+                    int index = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_LIST_TABSETTNG, LB_GETCURSEL, 0, 0));
 	                if (index == LB_ERR || index == 0) // index == 0 shouldn't happen
 		                return FALSE;
 

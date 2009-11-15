@@ -2125,7 +2125,7 @@ int NppParameters::addUserLangToEnd(const UserLangContainer & userLang, const TC
 	newLangContainer->setName(newName);
 	_userLangArray.push_back(newLangContainer);
 
-	return _userLangArray.size()-1;
+	return static_cast<int>(_userLangArray.size())-1;
 }
 
 void NppParameters::removeUserLang(int index)

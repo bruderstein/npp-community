@@ -206,7 +206,7 @@ public:
 
 	int getSelectedTextCount();
 
-	char * getWordFromRange(char * txt, int size, int pos1, int pos2);
+	char * getWordFromRange(char * txt, int size, DOCPOSITION pos1, DOCPOSITION pos2);
 	char * getSelectedText(char * txt, int size, bool expand = true);
 	char * getWordOnCaretPos(char * txt, int size);
 	TCHAR * getGenericWordOnCaretPos(TCHAR * txt, int size);
@@ -304,7 +304,7 @@ public:
 	void currentLineUp() const;
 	void currentLineDown() const;
 
-	std::pair<int, int> getSelectionLinesRange() const;
+	std::pair<LINENUMBER, LINENUMBER> getSelectionLinesRange() const;
 	void currentLinesUp() const;
 	void currentLinesDown() const;
 

@@ -694,7 +694,7 @@ public:
 		return _langList[i];
 	}
 
-	int getNbLang() const {return _langList.size();}
+	int getNbLang() const {return static_cast<int>(_langList.size()); }
 
 	const TCHAR * getLangExtFromName(const TCHAR *langName) const {
 		for( std::vector<Lang *>::const_iterator it = _langList.begin(), end = _langList.end();
@@ -718,7 +718,7 @@ public:
 		return NULL;
 	};
 
-	int getNbLRFile() const {return _LRFileList.size();}
+	int getNbLRFile() const { return static_cast<int>(_LRFileList.size()); }
 
 	const generic_string& getLRFile(int index) const {
 		// JOCE check if we can easily make index a size_t
@@ -772,7 +772,7 @@ public:
 	void setFontList(HWND hWnd);
 	const std::vector<generic_string> & getFontList() const {return _fontlist;};
 
-	int getNbUserLang() const {return _userLangArray.size();}
+	int getNbUserLang() const { return static_cast<int>(_userLangArray.size()) ;}
 	UserLangContainer & getULCFromIndex(int i) {return *_userLangArray[i];}
 	UserLangContainer * getULCFromName(const TCHAR *userLangName) {
 		std::vector<UserLangContainer *>::iterator it = _userLangArray.begin(), end = _userLangArray.end();

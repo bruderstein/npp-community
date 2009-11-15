@@ -69,8 +69,8 @@ void ControlsTab::reSizeTo(RECT & rc)
 bool ControlsTab::renameTab(const TCHAR *internalName, const TCHAR *newName)
 {
 	bool foundIt = false;
-	size_t i = 0;
-	for ( ; i < _pWinVector->size() ; i++)
+	int i = 0;
+	for ( ; i < static_cast<int>(_pWinVector->size()) ; i++)
 	{
 		if ((*_pWinVector)[i]._internalName == internalName)
 		{

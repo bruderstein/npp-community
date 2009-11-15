@@ -216,13 +216,13 @@ public:
 
 	void addSearchLine(const TCHAR *searchName);
 	void addFileNameTitle(const TCHAR * fileName);
-	void addFileHitCount(int count);
-	void addSearchHitCount(int count);
-	void add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb);
+	void addFileHitCount(LINENUMBER count);
+	void addSearchHitCount(LINENUMBER count);
+	void add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, LINENUMBER lineNb);
 	void setFinderStyle();
 	void removeAll();
 	void beginNewFilesSearch();
-	void finishFilesSearch(int count);
+	void finishFilesSearch(LINENUMBER count);
 
 	void gotoNextFoundResult(int direction);
 	void GotoFoundLine();
@@ -450,13 +450,13 @@ void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool /*is
 	if (!hCombo) return;
 	if (!lstrcmp(txt2add, TEXT(""))) return;
 
-	int i = ::SendMessage(hCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)txt2add);
+	int i = static_cast<int>(::SendMessage(hCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)txt2add));
 	if (i != CB_ERR) // found
 	{
 		::SendMessage(hCombo, CB_DELETESTRING, i, 0);
 	}
 
-	i = ::SendMessage(hCombo, CB_INSERTSTRING, 0, (LPARAM)txt2add);
+	i = static_cast<int>(::SendMessage(hCombo, CB_INSERTSTRING, 0, (LPARAM)txt2add));
 
 	::SendMessage(hCombo, CB_SETCURSEL, i, 0);
 }
@@ -634,7 +634,7 @@ void FindReplaceDlg::saveComboHistory(int id, int maxcount, int & oldcount, gene
 	TCHAR text[FINDREPLACE_MAXLENGTH];
 
 	hCombo = ::GetDlgItem(_hSelf, id);
-	count = ::SendMessage(hCombo, CB_GETCOUNT, 0, 0);
+	count = static_cast<int>(::SendMessage(hCombo, CB_GETCOUNT, 0, 0));
 	count = min(count, maxcount);
 	for (i = 0; i < count; i++)
 	{
@@ -1901,8 +1901,8 @@ LRESULT FAR PASCAL FindReplaceDlg::finderProc(HWND hwnd, UINT message, WPARAM wP
 {
 	if (message == WM_KEYDOWN && (wParam == VK_DELETE || wParam == VK_RETURN))
 	{
-		ScintillaEditView *pScint = (ScintillaEditView *)(::GetWindowLongPtr(hwnd, GWL_USERDATA));
-		Finder *pFinder = (Finder *)(::GetWindowLongPtr(pScint->getHParent(), GWL_USERDATA));
+		ScintillaEditView *pScint = (ScintillaEditView *)(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
+		Finder *pFinder = (Finder *)(::GetWindowLongPtr(pScint->getHParent(), GWLP_USERDATA));
 		if (wParam == VK_RETURN)
 			pFinder->GotoFoundLine();
 		else // VK_DELETE
@@ -2120,33 +2120,38 @@ void Finder::addFileNameTitle(const TCHAR * fileName)
 	_pMainMarkings->push_back(EmptySearchResultMarking);
 }
 
-void Finder::addFileHitCount(int count)
+// Hitcount is a LINENUMBER, as there could be atleast one hit per line
+void Finder::addFileHitCount(LINENUMBER count)
 	{
 	TCHAR text[20];
-	wsprintf(text, TEXT(" (%i hits)"), count);
+	TCHAR hitCountText[22];
+	generic_ztoa(count, hitCountText, 22, 10);
+	wsprintf(text, TEXT(" (%s hits)"), hitCountText);
 	setFinderReadOnly(false);
 	_scintView.insertGenericTextFrom(_lastFileHeaderPos, text);
 	setFinderReadOnly(true);
 	_nFoundFiles++;
 	}
 
-void Finder::addSearchHitCount(int count)
+void Finder::addSearchHitCount(LINENUMBER count)
 {
 	TCHAR text[50];
-	wsprintf(text, TEXT(" (%i hits in %i files)"), count, _nFoundFiles);
+	TCHAR hitCountText[22];
+	generic_ztoa(count, hitCountText, 22, 10);
+	wsprintf(text, TEXT(" (%s hits in %i files)"), hitCountText, _nFoundFiles);
 	setFinderReadOnly(false);
 	_scintView.insertGenericTextFrom(_lastSearchHeaderPos, text);
 	setFinderReadOnly(true);
 }
 
 
-void Finder::add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb)
+void Finder::add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, LINENUMBER lineNb)
 {
 	_pMainFoundInfos->push_back(fi);
 	generic_string str = TEXT("\tLine ");
 
-	TCHAR lnb[16];
-	wsprintf(lnb, TEXT("%d"), lineNb);
+	TCHAR lnb[22];
+	generic_ztoa(lineNb, lnb, 22, 10);
 	str += lnb;
 	str += TEXT(": ");
 	mi._start += str.length();
@@ -2187,7 +2192,7 @@ void Finder::beginNewFilesSearch()
 	_scintView.collapse(searchHeaderLevel - SC_FOLDLEVELBASE, fold_collapse);
 	}
 
-void Finder::finishFilesSearch(int count)
+void Finder::finishFilesSearch(LINENUMBER count)
 	{
 	std::vector<FoundInfo>* _pOldFoundInfos;
 	std::vector<SearchResultMarking>* _pOldMarkings;

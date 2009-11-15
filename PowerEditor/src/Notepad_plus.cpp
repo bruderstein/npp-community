@@ -3086,118 +3086,8 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 	return FALSE;
 }
 
-void Notepad_plus::copyMarkedLines()
-{
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
-	generic_string globalStr = TEXT("");
-	for (int i = lastLine ; i >= 0 ; i--)
-	{
-		if (bookmarkPresent(i))
-		{
-			generic_string currentStr = getMarkedLine(i) + globalStr;
-			globalStr = currentStr;
-		}
-	}
-	str2Cliboard(globalStr.c_str());
-}
 
-void Notepad_plus::cutMarkedLines()
-{
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
-	generic_string globalStr = TEXT("");
 
-	_pEditView->execute(SCI_BEGINUNDOACTION);
-	for (int i = lastLine ; i >= 0 ; i--)
-	{
-		if (bookmarkPresent(i))
-		{
-			generic_string currentStr = getMarkedLine(i) + globalStr;
-			globalStr = currentStr;
-
-			deleteMarkedline(i);
-		}
-	}
-	_pEditView->execute(SCI_ENDUNDOACTION);
-	str2Cliboard(globalStr.c_str());
-}
-
-void Notepad_plus::deleteMarkedLines()
-{
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
-
-	_pEditView->execute(SCI_BEGINUNDOACTION);
-	for (int i = lastLine ; i >= 0 ; i--)
-	{
-		if (bookmarkPresent(i))
-			deleteMarkedline(i);
-	}
-	_pEditView->execute(SCI_ENDUNDOACTION);
-}
-
-void Notepad_plus::pasteToMarkedLines()
-{
-	int clipFormat;
-#ifdef UNICODE
-	clipFormat = CF_UNICODETEXT;
-#else
-	clipFormat = CF_TEXT;
-#endif
-	BOOL canPaste = ::IsClipboardFormatAvailable(clipFormat);
-	if (!canPaste)
-		return;
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
-
-	::OpenClipboard(_hSelf);
-	HANDLE clipboardData = ::GetClipboardData(clipFormat);
-	::GlobalSize(clipboardData);
-	LPVOID clipboardDataPtr = ::GlobalLock(clipboardData);
-
-	generic_string clipboardStr = (const TCHAR *)clipboardDataPtr;
-
-	::GlobalUnlock(clipboardData);
-	::CloseClipboard();
-
-	_pEditView->execute(SCI_BEGINUNDOACTION);
-	for (int i = lastLine ; i >= 0 ; i--)
-	{
-		if (bookmarkPresent(i))
-		{
-			replaceMarkedline(i, clipboardStr.c_str());
-		}
-	}
-	_pEditView->execute(SCI_ENDUNDOACTION);
-}
-
-void Notepad_plus::deleteMarkedline(int ln)
-{
-	int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
-	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
-
-	bookmarkDelete(ln);
-	TCHAR emptyString[2] = TEXT("");
-	_pEditView->replaceTarget(emptyString, lineBegin, lineBegin + lineLen);
-  }
-
-void Notepad_plus::replaceMarkedline(int ln, const TCHAR *str)
-{
-	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
-	int lineEnd = _pEditView->execute(SCI_GETLINEENDPOSITION, ln);
-
-	_pEditView->replaceTarget(str, lineBegin, lineEnd);
-  }
-
-generic_string Notepad_plus::getMarkedLine(int ln)
-{
-	int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
-	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
-
-	TCHAR * buf = new TCHAR[lineLen+1];
-	_pEditView->getGenericText(buf, lineBegin, lineBegin + lineLen);
-	generic_string line = buf;
-	delete [] buf;
-
-	return line;
-}
 
 void Notepad_plus::findMatchingBracePos(DOCPOSITION & braceAtCaret, DOCPOSITION & braceOpposite)
 {
@@ -10871,6 +10761,7 @@ void Notepad_plus::bookmarkToggle(LINENUMBER lineno) const
 		bookmarkAdd(lineno);
 }
 
+
 void Notepad_plus::copyMarkedLines()
 {
 	LINENUMBER lastLine = _pEditView->lastZeroBasedLineNumber();
@@ -10952,28 +10843,30 @@ void Notepad_plus::pasteToMarkedLines()
 	_pEditView->execute(SCI_ENDUNDOACTION);
 }
 
+
+
 void Notepad_plus::deleteMarkedline(LINENUMBER ln)
 {
-	int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
-	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
+	DOCPOSITION lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
+	DOCPOSITION lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
 
 	bookmarkDelete(ln);
 	TCHAR emptyString[2] = TEXT("");
 	_pEditView->replaceTarget(emptyString, lineBegin, lineBegin + lineLen);
-}
+  }
 
 void Notepad_plus::replaceMarkedline(LINENUMBER ln, const TCHAR *str)
 {
-	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
-	int lineEnd = _pEditView->execute(SCI_GETLINEENDPOSITION, ln);
+	DOCPOSITION lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
+	DOCPOSITION lineEnd = _pEditView->execute(SCI_GETLINEENDPOSITION, ln);
 
 	_pEditView->replaceTarget(str, lineBegin, lineEnd);
-}
+  }
 
 generic_string Notepad_plus::getMarkedLine(LINENUMBER ln)
 {
-	int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
-	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
+	DOCPOSITION lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
+	DOCPOSITION lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
 
 	TCHAR * buf = new TCHAR[lineLen+1];
 	_pEditView->getGenericText(buf, lineBegin, lineBegin + lineLen);
@@ -10983,20 +10876,8 @@ generic_string Notepad_plus::getMarkedLine(LINENUMBER ln)
 	return line;
 }
 
-void Notepad_plus::setWorkingDir(const TCHAR *dir)
-{
-	NppParameters * params = NppParameters::getInstance();
-	if (params->getNppGUI()._openSaveDir == dir_last)
-		return;
-	if (params->getNppGUI()._openSaveDir == dir_userDef)
-	{
-		params->setWorkingDir(NULL);
-	}
-	else if (dir && PathIsDirectory(dir))
-	{
-		params->setWorkingDir(dir);
-	}
-}
+
+
 
 int Notepad_plus::getLangFromMenuName(const TCHAR * langName)
 {

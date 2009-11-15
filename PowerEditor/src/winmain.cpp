@@ -179,7 +179,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 #ifndef SHIPPING
 	if (isInList(FLAG_RUN_UNITTESTS, params))
 	{
-		int argc = params.size();
+		int argc = static_cast<int>(params.size());
 
 		TCHAR argv[4096];
 		TCHAR* argvPtr = &argv[0];
@@ -187,7 +187,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 		for (int i = 0; i< argc; i++)
 		{
 			_tcscpy_s(argvPtr, spaceLeft, params[i]);
-			int len = _tcslen(params[i]) + 1;
+			int len = static_cast<int>(_tcslen(params[i])) + 1;
 			argvPtr += len;
 			spaceLeft -= len;
 		}

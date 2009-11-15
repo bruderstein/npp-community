@@ -364,6 +364,7 @@ void DisplayColumn(HWND hWnd,int SI,int c,int offset,HFONT hfont,HFONT hcolumnhe
 	RECT rect,rectsave;
     HFONT holdfont;
 	int r;
+	TCHAR buffer[1000];
 	int iDataType,iProtection;
 	if(BGHS[SI].columnwidths[c]==0){return;}
 
