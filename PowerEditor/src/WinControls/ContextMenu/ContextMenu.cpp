@@ -60,7 +60,8 @@ void ContextMenu::create( HWND hParent, const std::vector<MenuItemUnit> & menuIt
 {
 	_hParent = hParent;
 	_hMenu = ::CreatePopupMenu();
-	for (size_t i = 0 ; i < menuItemArray.size() ; i++)
+	UINT menuSize = static_cast<UINT>(menuItemArray.size());
+	for (UINT i = 0 ; i < menuSize ; i++)
 	{
 		unsigned int flag = MF_BYPOSITION | ((menuItemArray[i]._cmdID == 0)?MF_SEPARATOR:0);
 		::InsertMenu(_hMenu, i, flag, menuItemArray[i]._cmdID, menuItemArray[i]._itemName.c_str());

@@ -47,8 +47,8 @@ private :
     COLORREF _colour;
 	bool isColourChooserLaunched;
 
-	static BOOL CALLBACK dlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-	BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK dlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 #endif //COLOUR_POPUP_H

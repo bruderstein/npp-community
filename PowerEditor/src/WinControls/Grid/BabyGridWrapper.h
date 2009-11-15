@@ -42,7 +42,7 @@ public :
 
 	void setColsNumbered(bool isNumbered = true);
 
-	void setText(size_t row, size_t col, const TCHAR *text);
+	void setText(int row, int col, const TCHAR *text);
 
 	void makeColAutoWidth(bool autoWidth = true);
 

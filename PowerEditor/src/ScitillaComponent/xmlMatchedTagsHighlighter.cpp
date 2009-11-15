@@ -21,7 +21,7 @@
 #include "Buffer.h"
 #include "Parameters.h"
 
-int XmlMatchedTagsHighlighter::getFirstTokenPosFrom(int targetStart, int targetEnd, const char *token, std::pair<int, int> & foundPos)
+DOCPOSITION XmlMatchedTagsHighlighter::getFirstTokenPosFrom(DOCPOSITION targetStart, DOCPOSITION targetEnd, const char *token, std::pair<DOCPOSITION, DOCPOSITION> & foundPos)
 {
 	//int start = currentPos;
 	//int end = (direction == DIR_LEFT)?0:_pEditView->getCurrentDocLen();
@@ -29,7 +29,7 @@ int XmlMatchedTagsHighlighter::getFirstTokenPosFrom(int targetStart, int targetE
 	_pEditView->execute(SCI_SETTARGETSTART, targetStart);
 	_pEditView->execute(SCI_SETTARGETEND, targetEnd);
 	_pEditView->execute(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
-	int posFind = _pEditView->execute(SCI_SEARCHINTARGET, (WPARAM)strlen(token), (LPARAM)token);
+	DOCPOSITION posFind = _pEditView->execute(SCI_SEARCHINTARGET, (WPARAM)strlen(token), (LPARAM)token);
 	if (posFind != -1)
 	{
 		foundPos.first = _pEditView->execute(SCI_GETTARGETSTART);
@@ -38,14 +38,14 @@ int XmlMatchedTagsHighlighter::getFirstTokenPosFrom(int targetStart, int targetE
 	return posFind;
 }
 
-TagCateg XmlMatchedTagsHighlighter::getTagCategory(XmlMatchedTagsPos & tagsPos, int curPos)
+TagCateg XmlMatchedTagsHighlighter::getTagCategory(XmlMatchedTagsPos & tagsPos, DOCPOSITION curPos)
 {
-	std::pair<int, int> foundPos;
+	std::pair<DOCPOSITION, DOCPOSITION> foundPos;
 
-	int docLen = _pEditView->getCurrentDocLen();
+	DOCPOSITION docLen = _pEditView->getCurrentDocLen();
 
-	int gtPos = getFirstTokenPosFrom(curPos, 0, ">", foundPos);
-	int ltPos = getFirstTokenPosFrom(curPos, 0, "<", foundPos);
+	DOCPOSITION gtPos = getFirstTokenPosFrom(curPos, 0, ">", foundPos);
+	DOCPOSITION ltPos = getFirstTokenPosFrom(curPos, 0, "<", foundPos);
 	if (ltPos != -1)
 	{
 		if ((gtPos != -1) && (ltPos < gtPos))
@@ -56,7 +56,7 @@ TagCateg XmlMatchedTagsHighlighter::getTagCategory(XmlMatchedTagsPos & tagsPos, 
 		// tagOpen : <Tag>, <Tag Attr="1" >
 		// tagClose : </Tag>
 		// tagSigle : <Tag/>, <Tag Attr="0" />
-		int charAfterLt = _pEditView->execute(SCI_GETCHARAT, ltPos+1);
+		int charAfterLt = static_cast<int>(_pEditView->execute(SCI_GETCHARAT, ltPos+1));
 		if (!charAfterLt)
 			return unknownPb;
 
@@ -65,8 +65,8 @@ TagCateg XmlMatchedTagsHighlighter::getTagCategory(XmlMatchedTagsPos & tagsPos, 
 
 		// so now we are sure we have tag sign '<'
 		// We'll see on the right
-		int gtPosOnR = getFirstTokenPosFrom(curPos, docLen, ">", foundPos);
-		int ltPosOnR = getFirstTokenPosFrom(curPos, docLen, "<", foundPos);
+		DOCPOSITION gtPosOnR = getFirstTokenPosFrom(curPos, docLen, ">", foundPos);
+		DOCPOSITION ltPosOnR = getFirstTokenPosFrom(curPos, docLen, "<", foundPos);
 
 		if (gtPosOnR == -1)
 			return invalidTag;
@@ -76,7 +76,7 @@ TagCateg XmlMatchedTagsHighlighter::getTagCategory(XmlMatchedTagsPos & tagsPos, 
 
 		if ((char)charAfterLt == '/')
 		{
-			int char2AfterLt = _pEditView->execute(SCI_GETCHARAT, ltPos+1+1);
+			int char2AfterLt = static_cast<int>(_pEditView->execute(SCI_GETCHARAT, ltPos+1+1));
 
 			if (!char2AfterLt)
 				return unknownPb;
@@ -95,7 +95,7 @@ TagCateg XmlMatchedTagsHighlighter::getTagCategory(XmlMatchedTagsPos & tagsPos, 
 			tagsPos.tagOpenStart = ltPos;
 			tagsPos.tagOpenEnd = gtPosOnR + 1;
 
-			int charBeforeLt = _pEditView->execute(SCI_GETCHARAT, gtPosOnR-1);
+			int charBeforeLt = static_cast<int>(_pEditView->execute(SCI_GETCHARAT, gtPosOnR-1));
 			if ((char)charBeforeLt == '/')
 				return inSingleTag;
 
@@ -106,25 +106,25 @@ TagCateg XmlMatchedTagsHighlighter::getTagCategory(XmlMatchedTagsPos & tagsPos, 
 	return outOfTag;
 }
 
-bool XmlMatchedTagsHighlighter::getMatchedTagPos(int searchStart, int searchEnd, const char *tag2find, const char *oppositeTag2find, std::vector<int> oppositeTagFound, XmlMatchedTagsPos & tagsPos)
+bool XmlMatchedTagsHighlighter::getMatchedTagPos(DOCPOSITION searchStart, DOCPOSITION searchEnd, const char *tag2find, const char *oppositeTag2find, std::vector<DOCPOSITION> oppositeTagFound, XmlMatchedTagsPos & tagsPos)
 {
 	const bool search2Left = false;
 	const bool search2Right = true;
 
 	bool direction = searchEnd > searchStart;
 
-	std::pair<int, int> foundPos;
-	int ltPosOnR = getFirstTokenPosFrom(searchStart, searchEnd, tag2find, foundPos);
+	std::pair<DOCPOSITION, DOCPOSITION> foundPos;
+	DOCPOSITION ltPosOnR = getFirstTokenPosFrom(searchStart, searchEnd, tag2find, foundPos);
 	if (ltPosOnR == -1)
 		return false;
 
 	// if the tag is found in non html zone, we skip it
 	const NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
-	int idStyle = _pEditView->execute(SCI_GETSTYLEAT, ltPosOnR);
+	int idStyle = static_cast<int>(_pEditView->execute(SCI_GETSTYLEAT, ltPosOnR));
 	if (!nppGUI._enableHiliteNonHTMLZone && (idStyle >= SCE_HJ_START || idStyle == SCE_H_COMMENT))
 	{
-		int start = (direction == search2Left)?foundPos.first:foundPos.second;
-		int end = searchEnd;
+		DOCPOSITION start = (direction == search2Left)?foundPos.first:foundPos.second;
+		DOCPOSITION end = searchEnd;
 		return getMatchedTagPos(start, end, tag2find, oppositeTag2find, oppositeTagFound, tagsPos);
 	}
 
@@ -137,22 +137,22 @@ bool XmlMatchedTagsHighlighter::getMatchedTagPos(int searchStart, int searchEnd,
 			return false;
 		if (tc == inSingleTag)
 		{
-			int start = foundPos.first;
-			int end = searchEnd;
+			DOCPOSITION start = foundPos.first;
+			DOCPOSITION end = searchEnd;
 			return getMatchedTagPos(start, end, tag2find, oppositeTag2find, oppositeTagFound, tagsPos);
 		}
 	}
 
-	std::pair<int, int> oppositeTagPos;
-	int s = foundPos.first;
-	int e = tagsPos.tagOpenEnd;
+	std::pair<DOCPOSITION, DOCPOSITION> oppositeTagPos;
+	DOCPOSITION s = foundPos.first;
+	DOCPOSITION e = tagsPos.tagOpenEnd;
 	if (direction == search2Left)
 	{
 		s = foundPos.second;
 		e = tagsPos.tagCloseStart;
 	}
 
-	int ltTag = getFirstTokenPosFrom(s, e, oppositeTag2find, oppositeTagPos);
+	DOCPOSITION ltTag = getFirstTokenPosFrom(s, e, oppositeTag2find, oppositeTagPos);
 
 	if (ltTag == -1)
 	{
@@ -241,7 +241,7 @@ bool XmlMatchedTagsHighlighter::getMatchedTagPos(int searchStart, int searchEnd,
 			oppositeTagFound.push_back(ltTag);
 		}
 	}
-	int start, end;
+	DOCPOSITION start, end;
 	if (direction == search2Left)
 	{
 		start = foundPos.first;
@@ -260,15 +260,15 @@ bool XmlMatchedTagsHighlighter::getMatchedTagPos(int searchStart, int searchEnd,
 bool XmlMatchedTagsHighlighter::getXmlMatchedTagsPos(XmlMatchedTagsPos & tagsPos)
 {
 	// get word where caret is on
-	int caretPos = _pEditView->execute(SCI_GETCURRENTPOS);
+	DOCPOSITION caretPos = _pEditView->execute(SCI_GETCURRENTPOS);
 
 	// if the tag is found in non html zone (include comment zone), then quit
 	const NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
-	int idStyle = _pEditView->execute(SCI_GETSTYLEAT, caretPos);
+	int idStyle = static_cast<int>(_pEditView->execute(SCI_GETSTYLEAT, caretPos));
 	if (!nppGUI._enableHiliteNonHTMLZone && (idStyle >= SCE_HJ_START || idStyle == SCE_H_COMMENT))
 		return false;
 
-	int docLen = _pEditView->getCurrentDocLen();
+	DOCPOSITION docLen = _pEditView->getCurrentDocLen();
 
 	// determinate the nature of current word : tagOpen, tagClose or outOfTag
 	TagCateg tagCateg = getTagCategory(tagsPos, caretPos);
@@ -280,8 +280,8 @@ bool XmlMatchedTagsHighlighter::getXmlMatchedTagsPos(XmlMatchedTagsPos & tagsPos
 		case tagOpen : // if tagOpen search right
 		{
 			_pEditView->execute(SCI_SETWORDCHARS, 0, (LPARAM)tagNameChars);
-			int startPos = _pEditView->execute(SCI_WORDSTARTPOSITION, tagsPos.tagOpenStart+1, true);
-			int endPos = _pEditView->execute(SCI_WORDENDPOSITION, tagsPos.tagOpenStart+1, true);
+			DOCPOSITION startPos = _pEditView->execute(SCI_WORDSTARTPOSITION, tagsPos.tagOpenStart+1, true);
+			DOCPOSITION endPos = _pEditView->execute(SCI_WORDENDPOSITION, tagsPos.tagOpenStart+1, true);
 			tagsPos.tagNameEnd = endPos;
 
 			_pEditView->execute(SCI_SETCHARSDEFAULT);
@@ -299,15 +299,15 @@ bool XmlMatchedTagsHighlighter::getXmlMatchedTagsPos(XmlMatchedTagsPos & tagsPos
 
 			delete [] tagName;
 
-			std::vector<int> passedTagList;
+			std::vector<DOCPOSITION> passedTagList;
 			return getMatchedTagPos(tagsPos.tagOpenEnd, docLen, closeTag.c_str(), openTag.c_str(), passedTagList, tagsPos);
 		}
 
 		case tagClose : // if tagClose search left
 		{
 			_pEditView->execute(SCI_SETWORDCHARS, 0, (LPARAM)tagNameChars);
-			int startPos = _pEditView->execute(SCI_WORDSTARTPOSITION, tagsPos.tagCloseStart+2, true);
-			int endPos = _pEditView->execute(SCI_WORDENDPOSITION, tagsPos.tagCloseStart+2, true);
+			DOCPOSITION startPos = _pEditView->execute(SCI_WORDSTARTPOSITION, tagsPos.tagCloseStart+2, true);
+			DOCPOSITION endPos = _pEditView->execute(SCI_WORDENDPOSITION, tagsPos.tagCloseStart+2, true);
 
 			_pEditView->execute(SCI_SETCHARSDEFAULT);
 			char * tagName = new char[endPos-startPos+1];
@@ -323,7 +323,7 @@ bool XmlMatchedTagsHighlighter::getXmlMatchedTagsPos(XmlMatchedTagsPos & tagsPos
 
 			delete [] tagName;
 
-			std::vector<int> passedTagList;
+			std::vector<DOCPOSITION> passedTagList;
 			bool isFound = getMatchedTagPos(tagsPos.tagCloseStart, 0, openTag.c_str(), closeTag.c_str(), passedTagList, tagsPos);
 			if (isFound)
 				tagsPos.tagNameEnd = tagsPos.tagOpenStart + 1 + (endPos - startPos);
@@ -334,7 +334,7 @@ bool XmlMatchedTagsHighlighter::getXmlMatchedTagsPos(XmlMatchedTagsPos & tagsPos
 		case inSingleTag : // if in single tag
 		{
 			_pEditView->execute(SCI_SETWORDCHARS, 0, (LPARAM)tagNameChars);
-			int endPos = _pEditView->execute(SCI_WORDENDPOSITION, tagsPos.tagOpenStart+1, true);
+			DOCPOSITION endPos = _pEditView->execute(SCI_WORDENDPOSITION, tagsPos.tagOpenStart+1, true);
 			tagsPos.tagNameEnd = endPos;
 			_pEditView->execute(SCI_SETCHARSDEFAULT);
 
@@ -348,11 +348,11 @@ bool XmlMatchedTagsHighlighter::getXmlMatchedTagsPos(XmlMatchedTagsPos & tagsPos
 	}
 }
 
-std::vector< std::pair<int, int> > XmlMatchedTagsHighlighter::getAttributesPos(int start, int end)
+std::vector< std::pair<DOCPOSITION, DOCPOSITION> > XmlMatchedTagsHighlighter::getAttributesPos(DOCPOSITION start, DOCPOSITION end)
 {
-	std::vector< std::pair<int, int> > attributes;
+	std::vector< std::pair<DOCPOSITION, DOCPOSITION> > attributes;
 
-	int bufLen = end - start + 1;
+	DOCPOSITION bufLen = end - start + 1;
 	char *buf = new char[bufLen+1];
 	_pEditView->getText(buf, start, end);
 
@@ -366,9 +366,9 @@ std::vector< std::pair<int, int> > XmlMatchedTagsHighlighter::getAttributesPos(i
 		attr_valid\
 	} state = attr_invalid;
 
-	int startPos = -1;
+	DOCPOSITION startPos = -1;
 	int oneMoreChar = 1;
-	int i = 0;
+	DOCPOSITION i = 0;
 	for (; i < bufLen ; i++)
 	{
 		switch (buf[i])
@@ -427,12 +427,12 @@ std::vector< std::pair<int, int> > XmlMatchedTagsHighlighter::getAttributesPos(i
 
 		if (state == attr_valid)
 		{
-			attributes.push_back(std::pair<int, int>(start+startPos, start+i+oneMoreChar));
+			attributes.push_back(std::pair<DOCPOSITION, DOCPOSITION>(start+startPos, start+i+oneMoreChar));
 			state = attr_invalid;
 		}
 	}
 	if (state == attr_value)
-		attributes.push_back(std::pair<int, int>(start+startPos, start+i-1));
+		attributes.push_back(std::pair<DOCPOSITION, DOCPOSITION>(start+startPos, start+i-1));
 
 	delete [] buf;
 	return attributes;
@@ -453,9 +453,9 @@ void XmlMatchedTagsHighlighter::tagMatch(bool doHiliteAttr)
 		return;
 
 	// Get the original targets and search options to restore after tag matching operation
-	int originalStartPos = _pEditView->execute(SCI_GETTARGETSTART);
-	int originalEndPos = _pEditView->execute(SCI_GETTARGETEND);
-	int originalSearchFlags = _pEditView->execute(SCI_GETSEARCHFLAGS);
+	DOCPOSITION originalStartPos = _pEditView->execute(SCI_GETTARGETSTART);
+	DOCPOSITION originalEndPos = _pEditView->execute(SCI_GETTARGETEND);
+	int originalSearchFlags = static_cast<int>(_pEditView->execute(SCI_GETSEARCHFLAGS));
 
 	// Detect if it's a xml/html tag. If yes, Colour it!
 	XmlMatchedTagsPos xmlTags;
@@ -478,7 +478,7 @@ void XmlMatchedTagsHighlighter::tagMatch(bool doHiliteAttr)
 
 		if (doHiliteAttr)
 		{
-			std::vector< std::pair<int, int> > attributes = getAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
+			std::vector< std::pair<DOCPOSITION, DOCPOSITION> > attributes = getAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
 			_pEditView->execute(SCI_SETINDICATORCURRENT,  SCE_UNIVERSAL_TAGATTR);
 			for (size_t i = 0 ; i < attributes.size() ; i++)
 			{

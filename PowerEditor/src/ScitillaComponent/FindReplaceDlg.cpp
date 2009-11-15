@@ -51,10 +51,10 @@ public:
 	static TargetRange t;
 	static int buildSearchFlags(FindOption * option) {
 		return	(option->_isWholeWord ? SCFIND_WHOLEWORD : 0) |
-				(option->_isMatchCase ? SCFIND_MATCHCASE : 0) |
-				(option->_searchType == FindRegex ? SCFIND_REGEXP|SCFIND_POSIX : 0);
+			(option->_isMatchCase ? SCFIND_MATCHCASE : 0) |
+			(option->_searchType == FindRegex ? SCFIND_REGEXP|SCFIND_POSIX : 0);
 	};
-	static void displaySectionCentered(int posStart, int posEnd, ScintillaEditView * pEditView, bool isDownwards = true);
+	static void displaySectionCentered(DOCPOSITION posStart, DOCPOSITION posEnd, ScintillaEditView * pEditView, bool isDownwards = true);
 
 private:
 	static bool readBase(const TCHAR * str, int * value, int base, int size);
@@ -149,22 +149,22 @@ bool Searching::readBase(const TCHAR * str, int * value, int base, int size) {
 	return true;
 }
 
-void Searching::displaySectionCentered(int posStart, int posEnd, ScintillaEditView * pEditView, bool isDownwards)
+void Searching::displaySectionCentered(DOCPOSITION posStart, DOCPOSITION posEnd, ScintillaEditView * pEditView, bool isDownwards)
 {
 	// to make sure the found result is visible
 	//When searching up, the beginning of the (possible multiline) result is important, when scrolling down the end
-	int testPos = (isDownwards)?posEnd:posStart;
+	DOCPOSITION testPos = (isDownwards)?posEnd:posStart;
 	pEditView->execute(SCI_SETCURRENTPOS, testPos);
-	int currentlineNumberDoc = (int)pEditView->execute(SCI_LINEFROMPOSITION, testPos);
-	int currentlineNumberVis = (int)pEditView->execute(SCI_VISIBLEFROMDOCLINE, currentlineNumberDoc);
+	LINENUMBER currentlineNumberDoc = (int)pEditView->execute(SCI_LINEFROMPOSITION, testPos);
+	LINENUMBER currentlineNumberVis = (int)pEditView->execute(SCI_VISIBLEFROMDOCLINE, currentlineNumberDoc);
 	pEditView->execute(SCI_ENSUREVISIBLE, currentlineNumberDoc);	// make sure target line is unfolded
 
-	int firstVisibleLineVis =	(int)pEditView->execute(SCI_GETFIRSTVISIBLELINE);
-	int linesVisible =			(int)pEditView->execute(SCI_LINESONSCREEN) - 1;	//-1 for the scrollbar
-	int lastVisibleLineVis =	(int)linesVisible + firstVisibleLineVis;
+	LINENUMBER firstVisibleLineVis =	pEditView->execute(SCI_GETFIRSTVISIBLELINE);
+	LINENUMBER linesVisible =			pEditView->execute(SCI_LINESONSCREEN) - 1;	//-1 for the scrollbar
+	LINENUMBER lastVisibleLineVis =	    linesVisible + firstVisibleLineVis;
 
 	//if out of view vertically, scroll line into (center of) view
-	int linesToScroll = 0;
+	LINENUMBER linesToScroll = 0;
 	if (currentlineNumberVis < firstVisibleLineVis)
 	{
 		linesToScroll = currentlineNumberVis - firstVisibleLineVis;
@@ -246,7 +246,10 @@ private:
 	SearchResultMarkings _MarkingsStruct;
 
 	ScintillaEditView _scintView;
-	unsigned int _nFoundFiles;
+
+	// X64CLEANUP - This is been converted to a LINENUMBER
+	// to avoid type issue with the number of items found variables
+	LINENUMBER _nFoundFiles;
 
 	DOCPOSITION _lastFileHeaderPos;
 	DOCPOSITION _lastSearchHeaderPos;
@@ -919,7 +922,7 @@ LRESULT CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 
 						nppParamInst->_isFindReplacing = true;
 						(*_ppEditView)->execute(SCI_BEGINUNDOACTION);
-						int nbReplaced = processAll(ProcessReplaceAll, NULL, NULL);
+						LINENUMBER nbReplaced = processAll(ProcessReplaceAll, NULL, NULL);
 						(*_ppEditView)->execute(SCI_ENDUNDOACTION);
 						nppParamInst->_isFindReplacing = false;
 
@@ -942,7 +945,7 @@ LRESULT CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 				{
 					if (_currentStatus == FIND_DLG)
 					{
-						int nbCounted = processAll(ProcessCountAll, NULL, NULL);
+						LINENUMBER nbCounted = processAll(ProcessCountAll, NULL, NULL);
 						generic_string result = TEXT("");
 
 						if (nbCounted < 0)
@@ -965,7 +968,7 @@ LRESULT CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 						updateCombo(IDFINDWHAT);
 
 						nppParamInst->_isFindReplacing = true;
-						int nbMarked = processAll(ProcessMarkAll, NULL, NULL);
+						LINENUMBER nbMarked = processAll(ProcessMarkAll, NULL, NULL);
 						nppParamInst->_isFindReplacing = false;
 						generic_string result = TEXT("");
 						if (nbMarked < 0)
@@ -1193,13 +1196,13 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options,
 		Searching::convertExtendedToString(txt2find, pText, stringSizeFind);
 	}
 
-	int docLength = int((*_ppEditView)->execute(SCI_GETLENGTH));
+	DOCPOSITION docLength = (*_ppEditView)->execute(SCI_GETLENGTH);
 	CharacterRange cr;
 	(*_ppEditView)->getSelection(cr);
 
 	//The search "zone" is relative to the selection, so search happens 'outside'
-	int startPosition = cr.cpMax;
-	int endPosition = docLength;
+	DOCPOSITION startPosition = cr.cpMax;
+	DOCPOSITION endPosition = docLength;
 
 	if (pOptions->_whichDirection == DIR_UP)
 	{
@@ -1231,7 +1234,7 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options,
 
 	(*_ppEditView)->execute(SCI_SETSEARCHFLAGS, flags);
 	//::SendMessageA(_hParent, WM_SETTEXT, 0, (LPARAM)pText);
-	int posFind = (*_ppEditView)->searchInTarget(pText, startPosition, endPosition);
+	DOCPOSITION posFind = (*_ppEditView)->searchInTarget(pText, startPosition, endPosition);
 	if (posFind == -1) //no match found in target, check if a new target should be used
 	{
 		if (pOptions->_isWrapAround)
@@ -1281,8 +1284,8 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options,
 		}
 	}
 
-	int start =				posFind;//int((*_ppEditView)->execute(SCI_GETTARGETSTART));
-	int end =				int((*_ppEditView)->execute(SCI_GETTARGETEND));
+	DOCPOSITION start =		posFind;//int((*_ppEditView)->execute(SCI_GETTARGETSTART));
+	DOCPOSITION end =		(*_ppEditView)->execute(SCI_GETTARGETEND);
 
 	// to make sure the found result is visible
 	Searching::displaySectionCentered(start, end, *_ppEditView, pOptions->_whichDirection == DIR_DOWN);
@@ -1323,24 +1326,24 @@ bool FindReplaceDlg::processReplace(const TCHAR *txt2find, const TCHAR *txt2repl
 	(*_ppEditView)->getSelection(cr);
 
 	(*_ppEditView)->execute(SCI_SETSEARCHFLAGS, flags);
-	int posFind = (*_ppEditView)->searchInTarget(pTextFind, cr.cpMin, cr.cpMax);
+	DOCPOSITION posFind = (*_ppEditView)->searchInTarget(pTextFind, cr.cpMin, cr.cpMax);
 	if (posFind != -1)
 	{
 		if (isRegExp)
 		{
 			//For the rare re exp case. ex: replace ^ by AAA
-			int start = int((*_ppEditView)->execute(SCI_GETTARGETSTART));
+			DOCPOSITION start = (*_ppEditView)->execute(SCI_GETTARGETSTART);
 			(*_ppEditView)->execute(SCI_GETTARGETEND);
 
-			int replacedLen = (*_ppEditView)->replaceTargetRegExMode(pTextReplace);
+			DOCPOSITION replacedLen = (*_ppEditView)->replaceTargetRegExMode(pTextReplace);
 
 			//if (!foundTextLen)
 			(*_ppEditView)->execute(SCI_SETSEL, start, start + replacedLen);
 		}
 		else
 		{
-			int start = int((*_ppEditView)->execute(SCI_GETTARGETSTART));
-			int replacedLen = (*_ppEditView)->replaceTarget(pTextReplace);
+			DOCPOSITION start = (*_ppEditView)->execute(SCI_GETTARGETSTART);
+			DOCPOSITION replacedLen = (*_ppEditView)->replaceTarget(pTextReplace);
 			(*_ppEditView)->execute(SCI_SETSEL, start, start + replacedLen);
 		}
 	}
@@ -1351,49 +1354,49 @@ bool FindReplaceDlg::processReplace(const TCHAR *txt2find, const TCHAR *txt2repl
 }
 
 
-int FindReplaceDlg::markAll(const TCHAR *txt2find, int styleID)
+LINENUMBER FindReplaceDlg::markAll(const TCHAR *txt2find, int styleID)
 {
 	_doStyleFoundToken = true;
 	FindOption opt;
 	opt._isMatchCase = true;
 	opt._isWholeWord = false;
 
-	int nbFound = processAll(ProcessMarkAllExt, txt2find, NULL, true, NULL, &opt, styleID);
+	LINENUMBER nbFound = processAll(ProcessMarkAllExt, txt2find, NULL, true, NULL, &opt, styleID);
 	return nbFound;
 }
 
 /*
-int FindReplaceDlg::markAll2(const TCHAR *txt2find)
+LINENUMBER FindReplaceDlg::markAll2(const TCHAR *txt2find)
 {
 	FindOption opt;
 	opt._isMatchCase = false;
 	opt._isWholeWord = true;
-	int nbFound = processAll(ProcessMarkAll_2, txt2find, NULL, true, NULL, &opt);
+	LINENUMBER nbFound = processAll(ProcessMarkAll_2, txt2find, NULL, true, NULL, &opt);
 	return nbFound;
 }
 */
 
 
-int FindReplaceDlg::markAllInc(const TCHAR *txt2find, FindOption *opt)
+LINENUMBER FindReplaceDlg::markAllInc(const TCHAR *txt2find, FindOption *opt)
 {
-	int nbFound = processAll(ProcessMarkAll_IncSearch, txt2find, NULL, true, NULL, opt);
+	LINENUMBER nbFound = processAll(ProcessMarkAll_IncSearch, txt2find, NULL, true, NULL, opt);
 	return nbFound;
 }
 
-int FindReplaceDlg::processAll(ProcessOperation op, const TCHAR *txt2find, const TCHAR *txt2replace, bool isEntire, const TCHAR *fileName, FindOption *opt, int colourStyleID)
+LINENUMBER FindReplaceDlg::processAll(ProcessOperation op, const TCHAR *txt2find, const TCHAR *txt2replace, bool isEntire, const TCHAR *fileName, FindOption *opt, int colourStyleID)
 {
 	FindOption *pOptions = opt?opt:&_options;
 
 	CharacterRange cr;
 	(*_ppEditView)->getSelection(cr);
-	int docLength = int((*_ppEditView)->execute(SCI_GETLENGTH));
+	DOCPOSITION docLength = int((*_ppEditView)->execute(SCI_GETLENGTH));
 
 	// Default :
 	//        direction : down
 	//        begin at : 0
 	//        end at : end of doc
-	int startPosition = 0;
-	int endPosition = docLength;
+	DOCPOSITION startPosition = 0;
+	DOCPOSITION endPosition = docLength;
 
 	bool direction = pOptions->_whichDirection;
 
@@ -1432,9 +1435,12 @@ int FindReplaceDlg::processAll(ProcessOperation op, const TCHAR *txt2find, const
 	return processRange(op, txt2find, txt2replace, startPosition, endPosition, fileName, opt, colourStyleID);
 }
 
-int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, const TCHAR *txt2replace, int startRange, int endRange, const TCHAR *fileName, FindOption *opt, int colourStyleID)
+LINENUMBER FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, const TCHAR *txt2replace, DOCPOSITION startRange, DOCPOSITION endRange, const TCHAR *fileName, FindOption *opt, int colourStyleID)
 {
-	int nbProcessed = 0;
+	// X64CLEANUP - This has been changed to a LINENUMBER
+	// specifically as it could process something for every line, which could be
+	// greater than max(int)
+	LINENUMBER nbProcessed = 0;
 
 	if (!isCreated() && !txt2find)
 		return nbProcessed;
@@ -1578,7 +1584,7 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 
 			case ProcessReplaceAll:
 			{
-				int replacedLength;
+				DOCPOSITION replacedLength;
 				if (isRegExp)
 					replacedLength = (*_ppEditView)->replaceTargetRegExMode(pTextReplace);
 				else
@@ -1968,7 +1974,7 @@ void FindReplaceDlg::beginNewFilesSearch()
 	_pFinder->addSearchLine(getText2search().c_str());
 }
 
-void FindReplaceDlg::finishFilesSearch( int count )
+void FindReplaceDlg::finishFilesSearch( LINENUMBER count )
 {
 	_pFinder->finishFilesSearch(count);
 }
@@ -2082,7 +2088,7 @@ void FindReplaceDlg::init( HINSTANCE hInst, HWND hParent, ScintillaEditView **pp
 		throw int(9900);
 	}
 	_ppEditView = ppEditView;
-}
+	}
 
 void Finder::addSearchLine(const TCHAR *searchName)
 {
@@ -2115,14 +2121,14 @@ void Finder::addFileNameTitle(const TCHAR * fileName)
 }
 
 void Finder::addFileHitCount(int count)
-{
+	{
 	TCHAR text[20];
 	wsprintf(text, TEXT(" (%i hits)"), count);
 	setFinderReadOnly(false);
 	_scintView.insertGenericTextFrom(_lastFileHeaderPos, text);
 	setFinderReadOnly(true);
 	_nFoundFiles++;
-}
+	}
 
 void Finder::addSearchHitCount(int count)
 {
@@ -2179,10 +2185,10 @@ void Finder::beginNewFilesSearch()
 
 	// fold all old searches (1st level only)
 	_scintView.collapse(searchHeaderLevel - SC_FOLDLEVELBASE, fold_collapse);
-}
+	}
 
 void Finder::finishFilesSearch(int count)
-{
+	{
 	std::vector<FoundInfo>* _pOldFoundInfos;
 	std::vector<SearchResultMarking>* _pOldMarkings;
 	_pOldFoundInfos = _pMainFoundInfos == &_foundInfos1 ? &_foundInfos2 : &_foundInfos1;
@@ -2314,9 +2320,9 @@ LRESULT CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 void FindIncrementDlg::setSearchText(const TCHAR * txt2find, bool /*isUTF8*/)
-{
-	::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)txt2find);
-}
+	{
+		::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)txt2find);
+	}
 
 void FindIncrementDlg::init(HINSTANCE hInst, HWND hParent, FindReplaceDlg *pFRDlg, bool isRTL)
 {

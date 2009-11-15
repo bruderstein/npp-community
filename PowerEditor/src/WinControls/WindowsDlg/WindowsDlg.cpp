@@ -44,18 +44,18 @@ inline static DWORD GetExStyle(HWND hWnd) {
 	return (DWORD)GetWindowLongPtr(hWnd, GWL_EXSTYLE);
 }
 
-inline static BOOL ModifyStyle(HWND hWnd, DWORD dwRemove, DWORD dwAdd) {
-	DWORD dwStyle = ::GetWindowLongPtr(hWnd, GWL_STYLE);
-	DWORD dwNewStyle = (dwStyle & ~dwRemove) | dwAdd;
+inline static BOOL ModifyStyle(HWND hWnd, LONG_PTR dwRemove, LONG_PTR dwAdd) {
+	LONG_PTR dwStyle = ::GetWindowLongPtr(hWnd, GWL_STYLE);
+	LONG_PTR dwNewStyle = (dwStyle & ~dwRemove) | dwAdd;
 	if(dwStyle == dwNewStyle)
 		return FALSE;
 	::SetWindowLongPtr(hWnd, GWL_STYLE, dwNewStyle);
 	return TRUE;
 }
 
-inline static BOOL ModifyStyleEx(HWND hWnd, DWORD dwRemove, DWORD dwAdd) {
-	DWORD dwStyle = ::GetWindowLongPtr(hWnd, GWL_EXSTYLE);
-	DWORD dwNewStyle = (dwStyle & ~dwRemove) | dwAdd;
+inline static BOOL ModifyStyleEx(HWND hWnd, LONG_PTR dwRemove, LONG_PTR dwAdd) {
+	LONG_PTR dwStyle = ::GetWindowLongPtr(hWnd, GWL_EXSTYLE);
+	LONG_PTR dwNewStyle = (dwStyle & ~dwRemove) | dwAdd;
 	if(dwStyle == dwNewStyle)
 		return FALSE;
 	::SetWindowLongPtr(hWnd, GWL_EXSTYLE, dwNewStyle);
@@ -97,7 +97,7 @@ struct NumericStringEquivalence
 			{
 				lcmp = generic_strtol(str1, &p1, 10) - generic_strtol(str2, &p2, 10);
 				if ( lcmp == 0 )
-					lcmp = (p2 - str2) - (p1 - str1);
+					lcmp = static_cast<int>((p2 - str2) - (p1 - str1));
 				if ( lcmp != 0 )
 					return (lcmp > 0 ? 1 : -1);
 				str1 = p1, str2 = p2;
@@ -114,6 +114,7 @@ struct NumericStringEquivalence
 		return ( lcmp < 0 ) ? -1 : (lcmp > 0 ? 1 : 0);
 	}
 };
+
 
 struct BufferEquivalent
 {
@@ -344,7 +345,7 @@ LRESULT CALLBACK WindowsDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lPa
 							_lastSort = iColumn;
 						}
 						int i;
-						int n = _idxMap.size();
+						int n = static_cast<int>(_idxMap.size());
 						std::vector<int> sortMap;
 						sortMap.resize(n);
 						for (i=0; i<n; ++i) sortMap[_idxMap[i]] = ListView_GetItemState(_hList, i, LVIS_SELECTED);
@@ -413,7 +414,7 @@ void WindowsDlg::updateButtonState()
 	EnableWindow(GetDlgItem(_hSelf, IDC_WINDOWS_SORT), _isSorted);
 }
 
-int WindowsDlg::doDialog(TiXmlNodeA *dlgNode)
+INT_PTR WindowsDlg::doDialog(TiXmlNodeA *dlgNode)
 {
 	_dlgNode = dlgNode;
 	return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_WINDOWS), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
@@ -573,18 +574,18 @@ void WindowsDlg::doRefresh(bool invalidate /*= false*/)
 	{
 		if (_hList != NULL)
 		{
-			size_t count = (_pTab != NULL) ? _pTab->nbItem() : 0;
-			size_t oldSize = _idxMap.size();
+			int count = (_pTab != NULL) ? _pTab->nbItem() : 0;
+			int oldSize = static_cast<int>(_idxMap.size());
 			if (!invalidate && count == oldSize)
 				return;
 
 			if (count != oldSize)
 			{
-				size_t lo = 0;
+				int lo = 0;
 				_idxMap.resize(count);
 				if (oldSize < count)
 					lo = oldSize;
-				for (size_t i=lo; i<count; ++i)
+				for (int i=lo; i<count; ++i)
 					_idxMap[i] = i;
 			}
 			LPARAM lp = invalidate ? LVSICF_NOSCROLL|LVSICF_NOINVALIDATEALL : LVSICF_NOSCROLL;

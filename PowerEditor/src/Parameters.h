@@ -298,7 +298,7 @@ struct NppGUI
 	GlobalOverride _globalOverride;
 	enum AutocStatus{autoc_none, autoc_func, autoc_word};
 	AutocStatus _autocStatus;
-	size_t  _autocFromLen;
+	int  _autocFromLen;
 	bool _funcParams;
 
 	generic_string _definedSessionExt;

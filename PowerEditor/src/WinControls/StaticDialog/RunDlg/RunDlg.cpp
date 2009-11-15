@@ -147,8 +147,8 @@ void expandNppEnvironmentStrs(const TCHAR *strSrc, TCHAR *stringDest, size_t str
 					TCHAR expandedStr[CURRENTWORD_MAXLENGTH];
 					if (internalVar == CURRENT_LINE || internalVar == CURRENT_COLUMN)
 					{
-						int lineNumber = ::SendMessage(hWnd, RUNCOMMAND_USER + internalVar, 0, 0);
-						wsprintf(expandedStr, TEXT("%d"), lineNumber);
+						LINENUMBER lineNumber = ::SendMessage(hWnd, RUNCOMMAND_USER + internalVar, 0, 0);
+						generic_ztoa(lineNumber, expandedStr, CURRENTWORD_MAXLENGTH, 10);
 					}
 					else
 						::SendMessage(hWnd, RUNCOMMAND_USER + internalVar, CURRENTWORD_MAXLENGTH, (LPARAM)expandedStr);
@@ -248,7 +248,7 @@ LRESULT CALLBACK RunDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lPara
 				{
 					std::vector<UserCommand> & theUserCmds = (NppParameters::getInstance())->getUserCommandList();
 
-					int nbCmd = theUserCmds.size();
+					int nbCmd = static_cast<int>(theUserCmds.size());
 
 					int cmdID = ID_USER_CMD + nbCmd;
 					TCHAR cmd[MAX_PATH];
@@ -296,15 +296,15 @@ LRESULT CALLBACK RunDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lPara
 void RunDlg::addTextToCombo(const TCHAR *txt2Add) const
 {
 	HWND handle = ::GetDlgItem(_hSelf, IDC_COMBO_RUN_PATH);
-	int i = ::SendMessage(handle, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)txt2Add);
+	int i = static_cast<int>(::SendMessage(handle, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)txt2Add));
 	if (i == CB_ERR)
-		i = ::SendMessage(handle, CB_ADDSTRING, 0, (LPARAM)txt2Add);
+		i = static_cast<int>(::SendMessage(handle, CB_ADDSTRING, 0, (LPARAM)txt2Add));
 	::SendMessage(handle, CB_SETCURSEL, i, 0);
 }
 void RunDlg::removeTextFromCombo(const TCHAR *txt2Remove) const
 {
 	HWND handle = ::GetDlgItem(_hSelf, IDC_COMBO_RUN_PATH);
-	int i = ::SendMessage(handle, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)txt2Remove);
+	int i = static_cast<int>(::SendMessage(handle, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)txt2Remove));
 	if (i == CB_ERR)
 		return;
 	::SendMessage(handle, CB_DELETESTRING, i, 0);

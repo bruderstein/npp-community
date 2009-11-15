@@ -304,7 +304,6 @@ LRESULT ScintillaEditView::scintillaNew_Proc(HWND hwnd, UINT Message, WPARAM wPa
 					return 0;
 
 				// get the codepage of the text
-				assert(execute(SCI_GETCODEPAGE) == static_cast<unsigned int>(execute(SCI_GETCODEPAGE)));
 				unsigned int codepage = static_cast<unsigned int>(execute(SCI_GETCODEPAGE));
 
 				// get the current text selection
@@ -1612,7 +1611,6 @@ void ScintillaEditView::getGenericText(TCHAR *dest, DOCPOSITION start, DOCPOSITI
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	char *destA = new char[end - start + 1];
 	getText(destA, start, end);
-	assert(execute(SCI_GETCODEPAGE) == static_cast<unsigned int>(execute(SCI_GETCODEPAGE)));
 	unsigned int cp = static_cast<unsigned int>(execute(SCI_GETCODEPAGE));
 
 	// X64CLEANUP: This needs looking at. char2wchar converts using int offsets, as does MultiByteToWideChar
@@ -1820,7 +1818,7 @@ DOCPOSITION ScintillaEditView::replaceTargetRegExMode(const TCHAR * re, DOCPOSIT
 #endif
 }
 
-void ScintillaEditView::showAutoComletion(int lenEntered, const TCHAR * list)
+void ScintillaEditView::showAutoCompletion(DOCPOSITION lenEntered, const TCHAR * list)
 {
 #ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
@@ -1832,7 +1830,7 @@ void ScintillaEditView::showAutoComletion(int lenEntered, const TCHAR * list)
 #endif
 }
 
-void ScintillaEditView::showCallTip(int startPos, const TCHAR * def)
+void ScintillaEditView::showCallTip(DOCPOSITION startPos, const TCHAR * def)
 {
 #ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
@@ -1846,7 +1844,7 @@ void ScintillaEditView::showCallTip(int startPos, const TCHAR * def)
 
 
 #ifdef UNICODE
-void ScintillaEditView::getLine(LINENUMBER lineNumber, TCHAR * line, int lineBufferLen)
+void ScintillaEditView::getLine(LINENUMBER lineNumber, TCHAR * line, DOCPOSITION lineBufferLen)
 {
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	unsigned int cp = static_cast<unsigned int>(execute(SCI_GETCODEPAGE));
@@ -2287,17 +2285,17 @@ void ScintillaEditView::convertSelectedTextTo(bool Case)
 
    DOCPOSITION selectionStart = execute(SCI_GETSELECTIONSTART);
    DOCPOSITION selectionEnd = execute(SCI_GETSELECTIONEND);
-
-   DOCPOSITION strSize = ((selectionEnd > selectionStart)?(selectionEnd - selectionStart):(selectionStart - selectionEnd))+1;
+   assert((selectionEnd - selectionStart) == static_cast<int>(selectionEnd - selectionStart));
+   int strSize = static_cast<int>(((selectionEnd > selectionStart)?(selectionEnd - selectionStart):(selectionStart - selectionEnd))+1);
    if (strSize)
    {
        char *selectedStr = new char[strSize+1];
-       DOCPOSITION strWSize = strSize * 2;
+       int strWSize = strSize * 2;
        wchar_t *selectedStrW = new wchar_t[strWSize+3];
 
        execute(SCI_GETSELTEXT, 0, (LPARAM)selectedStr);
-	   assert(strSize == static_cast<int>(strSize));
-       int nbChar = ::MultiByteToWideChar(codepage, 0, selectedStr, static_cast<int>(strSize), selectedStrW, strWSize);
+
+       int nbChar = ::MultiByteToWideChar(codepage, 0, selectedStr, strSize, selectedStrW, strWSize);
 
        for (int i = 0 ; i < nbChar ; i++)
        {
@@ -2306,7 +2304,7 @@ void ScintillaEditView::convertSelectedTextTo(bool Case)
            else
                selectedStrW[i] = (WCHAR)::CharLowerW((LPWSTR)selectedStrW[i]);
        }
-       ::WideCharToMultiByte(codepage, 0, selectedStrW, strWSize, selectedStr, static_cast<int>(strSize), NULL, NULL);
+       ::WideCharToMultiByte(codepage, 0, selectedStrW, strWSize, selectedStr, strSize, NULL, NULL);
 
        execute(SCI_REPLACESEL, strSize, (LPARAM)selectedStr);
        execute(SCI_SETSEL, selectionStart, selectionEnd);
@@ -2527,20 +2525,20 @@ void ScintillaEditView::columnReplace(ColumnModeInfos & cmi, int initial, int in
 			cmi[i]._selLpos += totalDiff;
 			cmi[i]._selRpos += totalDiff;
 
-		int2str(str, stringSize, initial, base, nb, isZeroLeading);
+			int2str(str, stringSize, initial, base, nb, isZeroLeading);
 
 			execute(SCI_SETTARGETSTART, cmi[i]._selLpos);
 			execute(SCI_SETTARGETEND, cmi[i]._selRpos);
 #ifdef UNICODE
-		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
-		unsigned int cp = static_cast<int>(execute(SCI_GETCODEPAGE));
-		const char *strA = wmc->wchar2char(str, cp);
-		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)strA);
+		    WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+		    unsigned int cp = static_cast<int>(execute(SCI_GETCODEPAGE));
+		    const char *strA = wmc->wchar2char(str, cp);
+		    execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)strA);
 #else
-		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str);
+			execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str);
 #endif
-		initial += incr;
-		totalDiff += diff;
+		    initial += incr;
+		    totalDiff += diff;
 			cmi[i]._selRpos += diff;
 		}
 	}
@@ -2638,9 +2636,9 @@ void ScintillaEditView::setHiLiteResultWords(const TCHAR *keywords)
 #endif
 }
 
-bool ScintillaEditView::markerMarginClick(int lineNumber) {
+bool ScintillaEditView::markerMarginClick(LINENUMBER lineNumber) {
 
-	int state = execute(SCI_MARKERGET, lineNumber);
+	int state = static_cast<int>(execute(SCI_MARKERGET, lineNumber));
 	bool openPresent = ((state & (1 << MARK_HIDELINESBEGIN)) != 0);
 	bool closePresent = ((state & (1 << MARK_HIDELINESEND)) != 0);
 
@@ -2654,7 +2652,7 @@ bool ScintillaEditView::markerMarginClick(int lineNumber) {
 	if (closePresent) {
 		openPresent = false;
 		for(lineNumber--; lineNumber >= 0 && !openPresent; lineNumber--) {
-			state = execute(SCI_MARKERGET, lineNumber);
+			state = static_cast<int>(execute(SCI_MARKERGET, lineNumber));
 			openPresent = ((state & (1 << MARK_HIDELINESBEGIN)) != 0);
 		}
 		if (openPresent) {
@@ -2665,14 +2663,14 @@ bool ScintillaEditView::markerMarginClick(int lineNumber) {
 	return true;
 }
 
-void ScintillaEditView::notifyMarkers(Buffer * buf, bool isHide, int location, bool del) {
+void ScintillaEditView::notifyMarkers(Buffer * buf, bool isHide, LINENUMBER location, bool del) {
 	if (buf != _currentBuffer)	//if not visible buffer dont do a thing
 		return;
 	runMarkers(isHide, location, false, del);
 }
 //Run through full document. When switching in or opening folding
 //hide is false only when user click on margin
-void ScintillaEditView::runMarkers(bool doHide, int searchStart, bool endOfDoc, bool doDelete) {
+void ScintillaEditView::runMarkers(bool doHide, LINENUMBER searchStart, bool endOfDoc, bool doDelete) {
 	//Removes markers if opening
 	/*
 	AllLines = (start,ENDOFDOCUMENT)
@@ -2699,12 +2697,12 @@ void ScintillaEditView::runMarkers(bool doHide, int searchStart, bool endOfDoc, 
 				Skip to LASTCHILD
 				Set last start to lastchild
 	*/
-	int maxLines = execute(SCI_GETLINECOUNT);
+	LINENUMBER maxLines = execute(SCI_GETLINECOUNT);
 	if (doHide) {
-		int startHiding = searchStart;
+		LINENUMBER startHiding = searchStart;
 		bool isInSection = false;
-		for(int i = searchStart; i < maxLines; i++) {
-			int state = execute(SCI_MARKERGET, i);
+		for(LINENUMBER i = searchStart; i < maxLines; i++) {
+			int state = static_cast<int>(execute(SCI_MARKERGET, i));
 			if ( ((state & (1 << MARK_HIDELINESEND)) != 0) ) {
 				if (isInSection) {
 					execute(SCI_HIDELINES, startHiding, i-1);
@@ -2721,10 +2719,10 @@ void ScintillaEditView::runMarkers(bool doHide, int searchStart, bool endOfDoc, 
 
 		}
 	} else {
-		int startShowing = searchStart;
+		LINENUMBER startShowing = searchStart;
 		bool isInSection = false;
-		for(int i = searchStart; i < maxLines; i++) {
-			int state = execute(SCI_MARKERGET, i);
+		for(LINENUMBER i = searchStart; i < maxLines; i++) {
+			int state = static_cast<int>(execute(SCI_MARKERGET, i));
 			if ( ((state & (1 << MARK_HIDELINESEND)) != 0) ) {
 				if (doDelete)
 					execute(SCI_MARKERDELETE, i, MARK_HIDELINESEND);
@@ -2752,7 +2750,7 @@ void ScintillaEditView::runMarkers(bool doHide, int searchStart, bool endOfDoc, 
 				}
 			}
 
-			int levelLine = execute(SCI_GETFOLDLEVEL, i, 0);
+			int levelLine = static_cast<int>(execute(SCI_GETFOLDLEVEL, i, 0));
 			if (levelLine & SC_FOLDLEVELHEADERFLAG) {	//fold section. Dont show lines if fold is closed
 				if (isInSection && execute(SCI_GETFOLDEXPANDED, i) == 0) {
 					execute(SCI_SHOWLINES, startShowing, i);
@@ -2823,13 +2821,13 @@ void ScintillaEditView::createHotSpotFromStyle(Style& out_hotspot, int idStyleFr
 #endif
 	out_hotspot._fontName = generic_fontname;
 
-	out_hotspot._fgColor = execute(SCI_STYLEGETFORE, idStyleFrom);
-	out_hotspot._bgColor = execute(SCI_STYLEGETBACK, idStyleFrom);
-	out_hotspot._fontSize = execute(SCI_STYLEGETSIZE, idStyleFrom);
+	out_hotspot._fgColor = static_cast<int>(execute(SCI_STYLEGETFORE, idStyleFrom));
+	out_hotspot._bgColor = static_cast<int>(execute(SCI_STYLEGETBACK, idStyleFrom));
+	out_hotspot._fontSize = static_cast<int>(execute(SCI_STYLEGETSIZE, idStyleFrom));
 
-	int isBold = execute(SCI_STYLEGETBOLD, idStyleFrom);
-	int isItalic = execute(SCI_STYLEGETITALIC, idStyleFrom);
-	int isUnderline = execute(SCI_STYLEGETUNDERLINE, idStyleFrom);
+	int isBold = static_cast<int>(execute(SCI_STYLEGETBOLD, idStyleFrom));
+	int isItalic = static_cast<int>(execute(SCI_STYLEGETITALIC, idStyleFrom));
+	int isUnderline = static_cast<int>(execute(SCI_STYLEGETUNDERLINE, idStyleFrom));
 	out_hotspot._fontStyle = (isBold?FONTSTYLE_BOLD:0) | (isItalic?FONTSTYLE_ITALIC:0) | (isUnderline?FONTSTYLE_UNDERLINE:0);
 
 	int urlAction = (NppParameters::getInstance())->getNppGUI()._styleURL;
@@ -2947,8 +2945,8 @@ void ScintillaEditView::getSelection(CharacterRange& range) const
 
 void ScintillaEditView::getWordToCurrentPos( TCHAR * str, int strLen ) const
 {
-	int caretPos = execute(SCI_GETCURRENTPOS);
-	int startPos = static_cast<int>(execute(SCI_WORDSTARTPOSITION, caretPos, true));
+	DOCPOSITION caretPos = execute(SCI_GETCURRENTPOS);
+	DOCPOSITION startPos = execute(SCI_WORDSTARTPOSITION, caretPos, true);
 
 	str[0] = '\0';
 	if ((caretPos - startPos) < strLen)
@@ -3064,23 +3062,23 @@ void ScintillaEditView::showWrapSymbol( bool willBeShown )
 	execute(SCI_SETWRAPVISUALFLAGS, willBeShown?SC_WRAPVISUALFLAG_END:SC_WRAPVISUALFLAG_NONE);
 }
 
-long ScintillaEditView::getCurrentLineNumber() const
+LINENUMBER ScintillaEditView::getCurrentLineNumber() const
 {
-	return long(execute(SCI_LINEFROMPOSITION, execute(SCI_GETCURRENTPOS)));
+	return execute(SCI_LINEFROMPOSITION, execute(SCI_GETCURRENTPOS));
 }
 
-long ScintillaEditView::lastZeroBasedLineNumber() const
+LINENUMBER ScintillaEditView::lastZeroBasedLineNumber() const
 {
-	int endPos = execute(SCI_GETLENGTH);
+	DOCPOSITION endPos = execute(SCI_GETLENGTH);
 	return execute(SCI_LINEFROMPOSITION, endPos);
 }
 
-long ScintillaEditView::getCurrentXOffset() const
+DOCPOSITION ScintillaEditView::getCurrentXOffset() const
 {
-	return long(execute(SCI_GETXOFFSET));
+	return execute(SCI_GETXOFFSET);
 }
 
-void ScintillaEditView::setCurrentXOffset( long xOffset )
+void ScintillaEditView::setCurrentXOffset( DOCPOSITION xOffset )
 {
 	execute(SCI_SETXOFFSET,xOffset);
 }
@@ -3092,12 +3090,12 @@ void ScintillaEditView::scroll(DOCPOSITION column, LINENUMBER line )
 
 long ScintillaEditView::getCurrentPointX() const
 {
-	return long (execute(SCI_POINTXFROMPOSITION, 0, execute(SCI_GETCURRENTPOS)));
+	return static_cast<long>(execute(SCI_POINTXFROMPOSITION, 0, execute(SCI_GETCURRENTPOS)));
 }
 
 long ScintillaEditView::getCurrentPointY() const
 {
-	return long (execute(SCI_POINTYFROMPOSITION, 0, execute(SCI_GETCURRENTPOS)));
+	return static_cast<long>(execute(SCI_POINTYFROMPOSITION, 0, execute(SCI_GETCURRENTPOS)));
 }
 
 long ScintillaEditView::getTextHeight() const
@@ -3204,8 +3202,8 @@ void ScintillaEditView::convertSelectedTextToUpperCase()
 
 void ScintillaEditView::clearIndicator( int indicatorNumber )
 {
-	int docStart = 0;
-	int docEnd = getCurrentDocLen();
+	DOCPOSITION docStart = 0;
+	DOCPOSITION docEnd = getCurrentDocLen();
 	execute(SCI_SETINDICATORCURRENT, indicatorNumber);
 	execute(SCI_INDICATORCLEARRANGE, docStart, docEnd-docStart);
 }

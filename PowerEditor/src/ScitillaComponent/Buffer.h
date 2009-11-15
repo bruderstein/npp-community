@@ -120,7 +120,7 @@ public:
 
 	int getFileNameFromBuffer(BufferID id, TCHAR * fn2copy);
 
-	int docLength(Buffer * buffer) const;
+	DOCPOSITION docLength(Buffer * buffer) const;
 
 private:
 	FileManager() : _nextNewNumber(1), _nextBufferID(0), _pNotepadPlus(NULL), _nrBufs(0), _pscratchTilla(NULL){};
@@ -284,7 +284,7 @@ public :
 	int addReference(ScintillaEditView * identifier);		//if ID not registered, creates a new Position for that ID and new foldstate
 	int removeReference(ScintillaEditView * identifier);		//reduces reference. If zero, Document is purged
 
-	void setHideLineChanged(bool isHide, int location);
+	void setHideLineChanged(bool isHide, LINENUMBER location);
 
 	void setDeferredReload();
 
@@ -301,7 +301,7 @@ public :
 	void setLineUndoState(size_t currentLine, size_t undoLevel, bool isSaved = false);
 	*/
 
-	int docLength() const {
+	DOCPOSITION docLength() const {
 		return _pManager->docLength(_id);
 	};
 

@@ -52,7 +52,7 @@ public :
 
 	void init(HINSTANCE hInst, HWND parent, HIMAGELIST hImgLst, bool dir);
 
-    int doDialog(bool isRTL = false);
+    INT_PTR doDialog(bool isRTL = false);
 
 protected :
 	LRESULT CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);

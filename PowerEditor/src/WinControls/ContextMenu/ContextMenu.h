@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define CONTEXTMENU_H
 
 struct MenuItemUnit {
-	unsigned long _cmdID;
+	UINT _cmdID;
 	generic_string _itemName;
 	generic_string _subMenuName;
 	MenuItemUnit();

@@ -217,9 +217,9 @@ public:
 	void addGenericText(const TCHAR * text2Append, long *mstart, long *mend) const;
 	DOCPOSITION replaceTarget(const TCHAR * str2replace, DOCPOSITION fromTargetPos = -1, DOCPOSITION toTargetPos = -1) const;
 	DOCPOSITION replaceTargetRegExMode(const TCHAR * re, DOCPOSITION fromTargetPos = -1, DOCPOSITION toTargetPos = -1) const;
-	void showAutoComletion(int lenEntered, const TCHAR * list);
-	void showCallTip(int startPos, const TCHAR * def);
-	void getLine(LINENUMBER lineNumber, TCHAR * line, int lineBufferLen);
+	void showAutoCompletion(DOCPOSITION lenEntered, const TCHAR * list);
+	void showCallTip(DOCPOSITION startPos, const TCHAR * def);
+	void getLine(LINENUMBER lineNumber, TCHAR * line, DOCPOSITION lineBufferLen);
 	void addText(DOCPOSITION length, const char *buf);
 
 	void saveCurrentPos();
@@ -267,11 +267,11 @@ public:
 	bool isWrapSymbolVisible() const;
     void showWrapSymbol(bool willBeShown = true);
 
-	long getCurrentLineNumber()const;
-	long lastZeroBasedLineNumber() const;
+	LINENUMBER getCurrentLineNumber()const;
+	LINENUMBER lastZeroBasedLineNumber() const;
 
-	long getCurrentXOffset()const;
-	void setCurrentXOffset(long xOffset);
+	DOCPOSITION getCurrentXOffset()const;
+	void setCurrentXOffset(DOCPOSITION xOffset);
 
 	void scroll(DOCPOSITION column, LINENUMBER line);
 
@@ -339,9 +339,9 @@ public:
 
 	void hideLines();
 
-	bool markerMarginClick(int lineNumber);	//true if it did something
-	void notifyMarkers(Buffer * buf, bool isHide, int location, bool del);
-	void runMarkers(bool doHide, int searchStart, bool endOfDoc, bool doDelete);
+	bool markerMarginClick(LINENUMBER lineNumber);	//true if it did something
+	void notifyMarkers(Buffer * buf, bool isHide, LINENUMBER location, bool del);
+	void runMarkers(bool doHide, LINENUMBER searchStart, bool endOfDoc, bool doDelete);
 
 	bool isSelecting() const;
 	void setHiLiteResultWords(const TCHAR *keywords);

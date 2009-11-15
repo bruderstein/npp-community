@@ -86,10 +86,10 @@ private :
 	ToolBarIcons* _toolBarIcons;
 	toolBarStatusType _state;
 	std::vector<tDynamicList> _vDynBtnReg;
-	size_t _nrButtons;
-	size_t _nrDynButtons;
-	size_t _nrTotalButtons;
-	size_t _nrCurrentButtons;
+	int _nrButtons;
+	int _nrDynButtons;
+	int _nrTotalButtons;
+	int _nrCurrentButtons;
 	ReBar * _pRebar;
 	REBARBANDINFO _rbBand;
 

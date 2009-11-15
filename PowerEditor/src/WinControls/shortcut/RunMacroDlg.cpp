@@ -131,7 +131,7 @@ LRESULT CALLBACK RunMacroDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*
 				default:
 					if ((HIWORD(wParam) == CBN_SELCHANGE) && (LOWORD(wParam) == IDC_MACRO_COMBO))
 					{
-						m_macroIndex = ::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_GETCURSEL, 0, 0);
+						m_macroIndex = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_GETCURSEL, 0, 0));
 						return TRUE;
 					}
 			}

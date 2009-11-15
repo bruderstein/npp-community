@@ -323,7 +323,7 @@ int Buffer::removeReference(ScintillaEditView * identifier) {
 	return _references;
 }
 
-void Buffer::setHideLineChanged(bool isHide, int location) {
+void Buffer::setHideLineChanged(bool isHide, LINENUMBER location) {
 	//First run through all docs without removing markers
 	for(int i = 0; i < _references; i++) {
 		_referees.at(i)->notifyMarkers(this, isHide, location, false);//(i == _references-1));
@@ -454,13 +454,13 @@ void FileManager::init(Notepad_plus * pNotepadPlus, ScintillaEditView * pscratch
 }
 
 void FileManager::checkFilesystemChanges() {
-	for(size_t i = 0; i < _nrBufs; i++) {
+	for(int i = 0; i < _nrBufs; i++) {
 		_buffers[i]->checkFileState();	//something has changed. Triggers update automatically
 	}
 }
 
 int FileManager::getBufferIndexByID(BufferID id) {
-	for(size_t i = 0; i < _nrBufs; i++) {
+	for(int i = 0; i < _nrBufs; i++) {
 		if (_buffers[i]->_id == id)
 			return (int)i;
 	}
@@ -638,15 +638,15 @@ bool FileManager::saveBuffer(BufferID id, const TCHAR * filename, bool isCopy) {
 		_pscratchTilla->execute(SCI_SETDOCPOINTER, 0, buffer->_doc);	//generate new document
 
 		char data[blockSize + 1];
-		int lengthDoc = _pscratchTilla->getCurrentDocLen();
-		for (int i = 0; i < lengthDoc; i += blockSize)
+		DOCPOSITION lengthDoc = _pscratchTilla->getCurrentDocLen();
+		for (DOCPOSITION i = 0; i < lengthDoc; i += blockSize)
 		{
-			int grabSize = lengthDoc - i;
+			DOCPOSITION grabSize = lengthDoc - i;
 			if (grabSize > blockSize)
 				grabSize = blockSize;
 
 			_pscratchTilla->getText(data, i, i + grabSize);
-			UnicodeConvertor.fwrite(data, grabSize);
+			UnicodeConvertor.fwrite(data, static_cast<size_t>(grabSize));
 		}
 		UnicodeConvertor.fclose();
 
@@ -779,7 +779,7 @@ BufferID FileManager::getBufferFromName(const TCHAR * name) {
 }
 
 BufferID FileManager::getBufferFromDocument(Document doc) {
-	for(size_t i = 0; i < _nrBufs; i++) {
+	for(int i = 0; i < _nrBufs; i++) {
 		if (_buffers[i]->_doc == doc)
 			return _buffers[i]->_id;
 	}
@@ -804,10 +804,10 @@ int FileManager::getFileNameFromBuffer(BufferID id, TCHAR * fn2copy) {
 	return lstrlen(buf->getFullPathName());
 }
 
-int FileManager::docLength(Buffer * buffer) const
+DOCPOSITION FileManager::docLength(Buffer * buffer) const
 {
 	_pscratchTilla->execute(SCI_SETDOCPOINTER, 0, buffer->_doc);
-	int docLen = _pscratchTilla->getCurrentDocLen();
+	DOCPOSITION docLen = _pscratchTilla->getCurrentDocLen();
 	_pscratchTilla->execute(SCI_SETDOCPOINTER, 0, _scratchDocDefault);
 	return docLen;
 }

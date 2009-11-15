@@ -60,7 +60,7 @@ void ColourPopup::create(int dialogID)
 	display();
 }
 
-BOOL CALLBACK ColourPopup::dlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ColourPopup::dlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -93,7 +93,7 @@ BOOL CALLBACK ColourPopup::dlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARA
 	}
 }
 
-BOOL CALLBACK ColourPopup::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ColourPopup::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 
 	switch (message)
@@ -231,8 +231,8 @@ BOOL CALLBACK ColourPopup::run_dlgProc(UINT message, WPARAM wParam, LPARAM lPara
                 {
 			        if (HIWORD(wParam) == LBN_SELCHANGE)
 		            {
-                        int i = ::SendMessage((HWND)lParam, LB_GETCURSEL, 0L, 0L);
-                        _colour = ::SendMessage((HWND)lParam, LB_GETITEMDATA, i, 0L);
+                        int i = static_cast<int>(::SendMessage((HWND)lParam, LB_GETCURSEL, 0L, 0L));
+                        _colour = static_cast<COLORREF>(::SendMessage((HWND)lParam, LB_GETITEMDATA, i, 0L));
 
                         ::SendMessage(_hParent, WM_PICKUP_COLOR, _colour, 0);
 					    return TRUE;

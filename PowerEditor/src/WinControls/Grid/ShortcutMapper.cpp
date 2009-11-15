@@ -115,27 +115,27 @@ void ShortcutMapper::fillOutBabyGrid()
 	NppParameters *nppParam = NppParameters::getInstance();
 	_babygrid->clear();
 
-	size_t nrItems = 0;
+	int nrItems = 0;
 
 	switch(_currentState) {
 		case STATE_MENU: {
-			nrItems = nppParam->getUserShortcuts().size();
+			nrItems = static_cast<int>(nppParam->getUserShortcuts().size());
 			_babygrid->setLineColNumber(nrItems, 2);
 			break; }
 		case STATE_MACRO: {
-			nrItems = nppParam->getMacroList().size();
+			nrItems = static_cast<int>(nppParam->getMacroList().size());
 			_babygrid->setLineColNumber(nrItems, 2);
 			break; }
 		case STATE_USER: {
-			nrItems = nppParam->getUserCommandList().size();
+			nrItems = static_cast<int>(nppParam->getUserCommandList().size());
 			_babygrid->setLineColNumber(nrItems, 2);
 			break; }
 		case STATE_PLUGIN: {
-			nrItems = nppParam->getPluginCommandList().size();
+			nrItems = static_cast<int>(nppParam->getPluginCommandList().size());
 			_babygrid->setLineColNumber(nrItems, 2);
 			break; }
 		case STATE_SCINTILLA: {
-			nrItems = nppParam->getScintillaKeyList().size();
+			nrItems = static_cast<int>(nppParam->getScintillaKeyList().size());
 			_babygrid->setLineColNumber(nrItems, 2);
 			break; }
 	}
@@ -146,35 +146,35 @@ void ShortcutMapper::fillOutBabyGrid()
 	switch(_currentState) {
 		case STATE_MENU: {
 			std::vector<CommandShortcut> & cshortcuts = nppParam->getUserShortcuts();
-			for(size_t i = 0; i < nrItems; i++) {
+			for(int i = 0; i < nrItems; i++) {
 				_babygrid->setText(i+1, 1, cshortcuts[i].getName());
 				_babygrid->setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_MACRO: {
 			std::vector<MacroShortcut> & cshortcuts = nppParam->getMacroList();
-			for(size_t i = 0; i < nrItems; i++) {
+			for(int i = 0; i < nrItems; i++) {
 				_babygrid->setText(i+1, 1, cshortcuts[i].getName());
 				_babygrid->setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_USER: {
 			std::vector<UserCommand> & cshortcuts = nppParam->getUserCommandList();
-			for(size_t i = 0; i < nrItems; i++) {
+			for(int i = 0; i < nrItems; i++) {
 				_babygrid->setText(i+1, 1, cshortcuts[i].getName());
 				_babygrid->setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_PLUGIN: {
 			std::vector<PluginCmdShortcut> & cshortcuts = nppParam->getPluginCommandList();
-			for(size_t i = 0; i < nrItems; i++) {
+			for(int i = 0; i < nrItems; i++) {
 				_babygrid->setText(i+1, 1, cshortcuts[i].getName());
 				_babygrid->setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_SCINTILLA: {
 			std::vector<ScintillaKeyMap> & cshortcuts = nppParam->getScintillaKeyList();
-			for(size_t i = 0; i < nrItems; i++) {
+			for(int i = 0; i < nrItems; i++) {
 				_babygrid->setText(i+1, 1, cshortcuts[i].getName());
 				_babygrid->setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
@@ -346,7 +346,7 @@ LRESULT CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 						int cmdID = -1;// = _pAccel->_pAccelArray[row-1].cmd;
 
 						// Menu data
-						size_t posBase = 0;
+						int posBase = 0;
 						size_t nbElem = 0;
 						HMENU hMenu = NULL;
 

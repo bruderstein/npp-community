@@ -22,9 +22,6 @@
 #include "StaticDialog.h"
 #endif
 
-#ifndef NUMBERTYPES_H
-#include "NumberTypes.h"
-#endif
 
 #define DEFAULT_NB_NUMBER 2
 

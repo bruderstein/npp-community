@@ -188,7 +188,7 @@ int TabBar::getCurrentTabIndex() const
 	return ::SendMessage(_hSelf, TCM_GETCURSEL, 0, 0);
 }
 
-void TabBar::setFont(TCHAR *fontName, size_t fontSize)
+void TabBar::setFont(TCHAR *fontName, int fontSize)
 {
 	if (_hFont)
 	{
@@ -487,7 +487,7 @@ LRESULT TabBarPlus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
 		// Custom window message to change tab control style on the fly
 		case WM_TABSETSTYLE:
 		{
-			DWORD style;
+			LONG_PTR style;
 			//::SendMessage(upDownWnd, UDM_SETBUDDY, NULL, 0);
 			style = ::GetWindowLongPtr(hwnd, GWL_STYLE);
 
@@ -521,7 +521,7 @@ LRESULT TabBarPlus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
 			}
 
             ::CallWindowProc(_tabBarDefaultProc, hwnd, Message, wParam, lParam);
-			int currentTabOn = ::SendMessage(_hSelf, TCM_GETCURSEL, 0, 0);
+			int currentTabOn = static_cast<int>(::SendMessage(_hSelf, TCM_GETCURSEL, 0, 0));
 
 			if (wParam == 2)
 				return TRUE;
@@ -1060,5 +1060,5 @@ int TabBarPlus::getTabIndexAt(int x, int y)
 	hitInfo.pt.x = x;
 	hitInfo.pt.y = y;
 
-	return ::SendMessage(_hSelf, TCM_HITTEST, 0, (LPARAM)&hitInfo);
+	return static_cast<int>(::SendMessage(_hSelf, TCM_HITTEST, 0, (LPARAM)&hitInfo));
 };

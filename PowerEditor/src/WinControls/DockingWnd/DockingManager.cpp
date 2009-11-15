@@ -238,7 +238,7 @@ LRESULT DockingManager::runProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 			}
 
 			/* destroy containers */
-			for (int i = _vContainer.size(); i > 0; i--)
+			for (int i = static_cast<int>(_vContainer.size()); i > 0; i--)
 			{
 				_vContainer[i-1]->destroy();
 				delete _vContainer[i-1];
@@ -540,7 +540,8 @@ void DockingManager::reSizeTo(RECT & rc)
 
 void DockingManager::showContainer(HWND hCont, BOOL view)
 {
-	for (size_t iCont = 0; iCont < _vContainer.size(); iCont++)
+	UINT size = static_cast<UINT>(_vContainer.size());
+	for (UINT iCont = 0; iCont < size; iCont++)
 	{
 		if (_vContainer[iCont]->getHSelf() == hCont)
 			showContainer(iCont, view);
@@ -610,7 +611,7 @@ void DockingManager::createDockableDlg(tTbData* data, int iCont, bool isVisible)
 
 				/* get previous position and set container id */
 				data->iPrevCont = (data->uMask & 0x30000000) >> 28;
-				iCont	= _vContainer.size()-1;
+				iCont	= static_cast<int>(_vContainer.size())-1;
 			}
 			else
 			{
@@ -638,7 +639,7 @@ void DockingManager::createDockableDlg(tTbData* data, int iCont, bool isVisible)
 				/* initialize and map container id */
 				pCont->init(_hInst, _hSelf);
 				pCont->doDialog(isVisible, true);
-				_iContMap[iCont] = _vContainer.size()-1;
+				_iContMap[iCont] = static_cast<int>(_vContainer.size())-1;
 			}
 
 			/* get current container from map */
@@ -658,7 +659,7 @@ void DockingManager::createDockableDlg(tTbData* data, int iCont, bool isVisible)
 				pCont->init(_hInst, _hSelf);
 				pCont->doDialog(false, true);
 				pCont->reSizeToWH(data->rcFloat);
-				_iContMap[data->iPrevCont] = _vContainer.size()-1;
+				_iContMap[data->iPrevCont] = static_cast<int>(_vContainer.size())-1;
 			}
 			data->iPrevCont = _iContMap[data->iPrevCont];
 		}
@@ -931,8 +932,9 @@ BOOL DockingManager::ContExists(size_t iCont)
 int DockingManager::GetContainer(DockingCont* pCont)
 {
 	int		iRet = -1;
+	int		size = static_cast<int>(_vContainer.size());
 
-	for (size_t iCont = 0; iCont < _vContainer.size(); iCont++)
+	for (int iCont = 0; iCont < size; iCont++)
 	{
 		if (_vContainer[iCont] == pCont)
 		{
@@ -978,7 +980,8 @@ int DockingManager::FindEmptyContainer()
     }
 
     /* find free container */
-    for (size_t iCont = DOCKCONT_MAX; iCont < _vContainer.size(); iCont++)
+	int vContainerSize = static_cast<int>(_vContainer.size());
+    for (int iCont = DOCKCONT_MAX; iCont < vContainerSize; iCont++)
     {
         if (pArrayPos[iCont] == FALSE)
         {

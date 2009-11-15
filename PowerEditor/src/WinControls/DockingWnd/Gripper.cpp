@@ -46,12 +46,12 @@ static LRESULT CALLBACK hookProcMouse(INT nCode, WPARAM wParam, LPARAM lParam)
 			case WM_MOUSEMOVE:
 			case WM_NCMOUSEMOVE:
 				//::PostMessage(hWndServer, wParam, 0, 0);
-				::SendMessage(hWndServer, wParam, 0, 0);
+				::SendMessage(hWndServer, static_cast<UINT>(wParam), 0, 0);
 				break;
 			case WM_LBUTTONUP:
 			case WM_NCLBUTTONUP:
 				//::PostMessage(hWndServer, wParam, 0, 0);
-				::SendMessage(hWndServer, wParam, 0, 0);
+				::SendMessage(hWndServer, static_cast<UINT>(wParam), 0, 0);
 				return TRUE;
 			default:
 				break;
@@ -440,7 +440,7 @@ void Gripper::doTabReordering(POINT pt)
 				/* get pointed tab item */
 				info.pt	= pt;
 				::ScreenToClient(hTab, &info.pt);
-				iItem = ::SendMessage(hTab, TCM_HITTEST, 0, (LPARAM)&info);
+				iItem = static_cast<int>(::SendMessage(hTab, TCM_HITTEST, 0, (LPARAM)&info));
 
 				if (iItem != -1)
 				{
@@ -458,7 +458,7 @@ void Gripper::doTabReordering(POINT pt)
 				else if ((hTab != _hTab) || (_iItem == -1))
 				{
 					/* test if cusor points after last tab */
-					int		iLastItem	= ::SendMessage(hTab, TCM_GETITEMCOUNT, 0, 0) - 1;
+					int		iLastItem	= static_cast<int>(::SendMessage(hTab, TCM_GETITEMCOUNT, 0, 0)) - 1;
 
 					::SendMessage(hTab, TCM_GETITEMRECT, iLastItem, (LPARAM)&rc);
 					if ((rc.left + rc.right) < pt.x)
@@ -480,7 +480,7 @@ void Gripper::doTabReordering(POINT pt)
 		if (_hTab == _hTabSource)
 		{
 			/* delete item if switching back to source tab */
-			int iSel = ::SendMessage(_hTab, TCM_GETCURSEL, 0, 0);
+			int iSel = static_cast<int>(::SendMessage(_hTab, TCM_GETCURSEL, 0, 0));
 			::SendMessage(_hTab, TCM_DELETEITEM, iSel, 0);
 		}
 		else if (_hTab == hTabOld)
@@ -767,7 +767,7 @@ void Gripper::initTabInformation()
 	else
 	{
 		/* get active tab item */
-		_iItem	= ::SendMessage(_hTabSource, TCM_GETCURSEL, 0, 0);
+		_iItem	= static_cast<int>(::SendMessage(_hTabSource, TCM_GETCURSEL, 0, 0));
 	}
 
 	/* get size of item */

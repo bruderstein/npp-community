@@ -110,7 +110,7 @@ void SharedParametersDialog::initControls()
         const std::vector<generic_string> & fontlist = pNppParam->getFontList();
         for (int j = 0 ; j < int(fontlist.size()) ; j++)
         {
-            int k = ::SendMessage(hFontNameCombo, CB_ADDSTRING, 0, (LPARAM)fontlist[j].c_str());
+            int k = static_cast<int>(::SendMessage(hFontNameCombo, CB_ADDSTRING, 0, (LPARAM)fontlist[j].c_str()));
             ::SendMessage(hFontNameCombo, CB_SETITEMDATA, k, (LPARAM)fontlist[j].c_str());
         }
     }
@@ -118,7 +118,7 @@ void SharedParametersDialog::initControls()
 
 bool SharedParametersDialog::getPropertyByCheck(HWND hwnd, WPARAM id)
 {
-	bool bool2set = (BST_CHECKED == ::SendMessage(::GetDlgItem(hwnd, id), BM_GETCHECK, 0, 0));
+	bool bool2set = (BST_CHECKED == ::SendMessage(::GetDlgItem(hwnd, static_cast<int>(id)), BM_GETCHECK, 0, 0));
 
 	if (_pScintilla->getCurrentBuffer()->getLangType() == L_USER)
 		_pScintilla->styleChange();
@@ -136,7 +136,7 @@ void SharedParametersDialog::styleUpdate(const Style & style, ColourPicker *pFgC
 	pBgColourPicker->redraw();
 
 	HWND hFontCombo = ::GetDlgItem(_hSelf, fontComboId);
-	int i = ::SendMessage(hFontCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)style._fontName.c_str());
+	int i = static_cast<int>(::SendMessage(hFontCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)style._fontName.c_str()));
 	if (i == CB_ERR)
 		i = 0;
 	::SendMessage(hFontCombo, CB_SETCURSEL, i, 0);
@@ -148,7 +148,7 @@ void SharedParametersDialog::styleUpdate(const Style & style, ColourPicker *pFgC
 		wsprintf(size, TEXT("%d"), style._fontSize);
 
 	hFontCombo = ::GetDlgItem(_hSelf, fontSizeComboId);
-	i = ::SendMessage(hFontCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)size);
+	i = static_cast<int>(::SendMessage(hFontCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)size));
 	if (i != CB_ERR)
 		::SendMessage(hFontCombo, CB_SETCURSEL, i, 0);
 	int isBold = 0;
@@ -257,7 +257,7 @@ LRESULT CALLBACK SharedParametersDialog::run_dlgProc(UINT Message, WPARAM wParam
 
 				if (k != -1)
 				{
-					int i = ::SendDlgItemMessage(_hSelf, LOWORD(wParam), CB_GETCURSEL, 0, 0);
+					int i = static_cast<int>(::SendDlgItemMessage(_hSelf, LOWORD(wParam), CB_GETCURSEL, 0, 0));
 					Style & style = _pUserLang->_styleArray.getStyler(k);
 					if (isFontSize)
 					{
@@ -313,7 +313,7 @@ LRESULT CALLBACK SharedParametersDialog::run_dlgProc(UINT Message, WPARAM wParam
 				else
 				{
 					int fontStyleMask;
-					int k = getGroupeIndexFromCheck(wParam, fontStyleMask);
+					int k = getGroupeIndexFromCheck(static_cast<int>(wParam), fontStyleMask);
 
 					if (k != -1)
 					{
@@ -990,18 +990,18 @@ void SymbolsStyleDialog::symbolAction(bool action)
 		idButton2Enable = IDC_ADD_BUTTON;
 		idButton2Disable = IDC_REMOVE_BUTTON;
 	}
-	int i = ::SendDlgItemMessage(_hSelf, id2Remove, LB_GETCURSEL, 0, 0);
+	int i = static_cast<int>(::SendDlgItemMessage(_hSelf, id2Remove, LB_GETCURSEL, 0, 0));
 	TCHAR s[2];
 	::SendDlgItemMessage(_hSelf, id2Remove, LB_GETTEXT, i, (LPARAM)s);
 
 	::SendDlgItemMessage(_hSelf, id2Add, LB_ADDSTRING, 0, (LPARAM)s);
 	::SendDlgItemMessage(_hSelf, id2Remove, LB_DELETESTRING, i, 0);
-	int count = ::SendDlgItemMessage(_hSelf, id2Remove, LB_GETCOUNT, 0, 0);
+	int count = static_cast<int>(::SendDlgItemMessage(_hSelf, id2Remove, LB_GETCOUNT, 0, 0));
 	if (i == count)
 		i -= 1;
 
 	::SendDlgItemMessage(_hSelf, id2Remove, LB_SETCURSEL, i, 0);
-	count = ::SendDlgItemMessage(_hSelf, id2Remove, LB_GETCOUNT, 0, 0);
+	count = static_cast<int>(::SendDlgItemMessage(_hSelf, id2Remove, LB_GETCOUNT, 0, 0));
 
 	// If there's no symbol, we activate another side
 	if (!count)
@@ -1012,7 +1012,7 @@ void SymbolsStyleDialog::symbolAction(bool action)
 	}
 
 	// Get the operators list
-	count = ::SendDlgItemMessage(_hSelf, IDC_ACTIVATED_SYMBOL_LIST, LB_GETCOUNT, 0, 0);
+	count = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_ACTIVATED_SYMBOL_LIST, LB_GETCOUNT, 0, 0));
 
 	int j = 0;
 	for (int i = 0 ; i < count ; i++)
@@ -1029,12 +1029,12 @@ void SymbolsStyleDialog::symbolAction(bool action)
 
 void SymbolsStyleDialog::listboxsRemoveAll()
 {
-	int count = ::SendDlgItemMessage(_hSelf, IDC_AVAILABLE_SYMBOLS_LIST, LB_GETCOUNT, 0, 0);
+	int count = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_AVAILABLE_SYMBOLS_LIST, LB_GETCOUNT, 0, 0));
 	for (int i = count-1 ; i >= 0 ; i--)
 	{
 		::SendDlgItemMessage(_hSelf, IDC_AVAILABLE_SYMBOLS_LIST, LB_DELETESTRING, i, 0);
 	}
-	count = ::SendDlgItemMessage(_hSelf, IDC_ACTIVATED_SYMBOL_LIST, LB_GETCOUNT, 0, 0);
+	count = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_ACTIVATED_SYMBOL_LIST, LB_GETCOUNT, 0, 0));
 	for (int i = count-1 ; i >= 0 ; i--)
 	{
 		::SendDlgItemMessage(_hSelf, IDC_ACTIVATED_SYMBOL_LIST, LB_DELETESTRING, i, 0);
@@ -1053,7 +1053,7 @@ void SymbolsStyleDialog::updateDlg()
 			TCHAR s[2];
 			s[0] = symbols[i];
 			s[1] = '\0';
-			int index = ::SendDlgItemMessage(_hSelf, IDC_AVAILABLE_SYMBOLS_LIST, LB_FINDSTRING, (WPARAM)-1, (LPARAM)s);
+			int index = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_AVAILABLE_SYMBOLS_LIST, LB_FINDSTRING, (WPARAM)-1, (LPARAM)s));
 			if (index == LB_ERR)
 				continue;
 
@@ -1064,12 +1064,12 @@ void SymbolsStyleDialog::updateDlg()
 
 			::SendDlgItemMessage(_hSelf, id2Add, LB_ADDSTRING, 0, (LPARAM)s);
 			::SendDlgItemMessage(_hSelf, id2Remove, LB_DELETESTRING, index, 0);
-			int count = ::SendDlgItemMessage(_hSelf, id2Remove, LB_GETCOUNT, 0, 0);
+			int count = static_cast<int>(::SendDlgItemMessage(_hSelf, id2Remove, LB_GETCOUNT, 0, 0));
 			if (index == count)
 				index -= 1;
 
 			::SendDlgItemMessage(_hSelf, id2Remove, LB_SETCURSEL, index, 0);
-			count = ::SendDlgItemMessage(_hSelf, id2Remove, LB_GETCOUNT, 0, 0);
+			count = static_cast<int>(::SendDlgItemMessage(_hSelf, id2Remove, LB_GETCOUNT, 0, 0));
 
 			// If there's no symbol, we activate another side
 			if (!count)
@@ -1095,7 +1095,7 @@ void SymbolsStyleDialog::updateDlg()
 		if (delims[0] != '0')
 			dOpen1[0] = delims[0];
 
-		int i = ::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BO2_COMBO, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)dOpen1);
+		int i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BO2_COMBO, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)dOpen1));
 		if (i == CB_ERR)
 			i = 0;
 		::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BO2_COMBO,CB_SETCURSEL, i, 0);
@@ -1103,7 +1103,7 @@ void SymbolsStyleDialog::updateDlg()
 		if (delims[1] != '0')
 			dOpen2[0] = delims[1];
 
-		i = ::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BO3_COMBO, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)dOpen2);
+		i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BO3_COMBO, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)dOpen2));
 		if (i == CB_ERR)
 			i = 0;
 		::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BO3_COMBO,CB_SETCURSEL, i, 0);
@@ -1113,7 +1113,7 @@ void SymbolsStyleDialog::updateDlg()
 		if (delims[3] != '0')
 			dClose1[0] = delims[3];
 
-		i = ::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BC2_COMBO, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)dClose1);
+		i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BC2_COMBO, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)dClose1));
 		if (i == CB_ERR)
 			i = 0;
 		::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BC2_COMBO,CB_SETCURSEL, i, 0);
@@ -1121,7 +1121,7 @@ void SymbolsStyleDialog::updateDlg()
 		if (delims[4] != '0')
 			dClose2[0] = delims[4];
 
-		i = ::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BC3_COMBO, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)dClose2);
+		i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BC3_COMBO, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)dClose2));
 		if (i == CB_ERR)
 			i = 0;
 		::SendDlgItemMessage(_hSelf, IDC_SYMBOL_BC3_COMBO,CB_SETCURSEL, i, 0);
@@ -1266,7 +1266,7 @@ LRESULT CALLBACK SymbolsStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LP
 						idButton2Disable = IDC_ADD_BUTTON;
 					}
 
-					int i = ::SendDlgItemMessage(_hSelf, LOWORD(wParam), LB_GETCURSEL, 0, 0);
+					int i = static_cast<int>(::SendDlgItemMessage(_hSelf, LOWORD(wParam), LB_GETCURSEL, 0, 0));
 					if (i != LB_ERR)
 					{
 						::EnableWindow(::GetDlgItem(_hSelf, idButton2Enable), TRUE);
@@ -1280,7 +1280,7 @@ LRESULT CALLBACK SymbolsStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LP
 					(LOWORD(wParam) == IDC_SYMBOL_BO3_COMBO) || (LOWORD(wParam) == IDC_SYMBOL_BC3_COMBO))
 				{
 					TCHAR charStr[5] = TEXT("");
-					int i = ::SendDlgItemMessage(_hSelf, LOWORD(wParam), CB_GETCURSEL, 0, 0);
+					int i = static_cast<int>(::SendDlgItemMessage(_hSelf, LOWORD(wParam), CB_GETCURSEL, 0, 0));
 					::SendDlgItemMessage(_hSelf, LOWORD(wParam), CB_GETLBTEXT, i, (LPARAM)charStr);
 					int symbIndex;
 
@@ -1456,7 +1456,7 @@ void UserDefineDialog::updateDlg()
 {
 	if (!_isDirty)
 	{
-		int i = ::SendDlgItemMessage(_hSelf, IDC_LANGNAME_COMBO, CB_GETCURSEL, 0, 0);
+		int i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_LANGNAME_COMBO, CB_GETCURSEL, 0, 0));
 		if (i > 0)
 			_isDirty = true;
 	}
@@ -1577,7 +1577,7 @@ LRESULT CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPAR
 		{
 			if ((HWND)lParam == ::GetDlgItem(_hSelf, IDC_UD_PERCENTAGE_SLIDER))
 			{
-				int percent = ::SendDlgItemMessage(_hSelf, IDC_UD_PERCENTAGE_SLIDER, TBM_GETPOS, 0, 0);
+				int percent = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_UD_PERCENTAGE_SLIDER, TBM_GETPOS, 0, 0));
 				pNppParam->SetTransparent(_hSelf, percent/*HIWORD(wParam)*/);
 			}
 			return TRUE;
@@ -1596,7 +1596,7 @@ LRESULT CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPAR
             {
 				if (LOWORD(wParam) == IDC_LANGNAME_COMBO)
 				{
-					int i = ::SendDlgItemMessage(_hSelf, LOWORD(wParam), CB_GETCURSEL, 0, 0);
+					int i = static_cast<int>(::SendDlgItemMessage(_hSelf, LOWORD(wParam), CB_GETCURSEL, 0, 0));
 					enableLangAndControlsBy(i);
 					updateDlg();
 				}
@@ -1630,7 +1630,7 @@ LRESULT CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPAR
 								bool isChecked = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_UD_TRANSPARENT_CHECK, BM_GETCHECK, 0, 0));
 								if (isChecked)
 								{
-									int percent = ::SendDlgItemMessage(_hSelf, IDC_UD_PERCENTAGE_SLIDER, TBM_GETPOS, 0, 0);
+									int percent = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_UD_PERCENTAGE_SLIDER, TBM_GETPOS, 0, 0));
 									pNppParam->SetTransparent(_hSelf, percent);
 								}
 								::ShowWindow(::GetDlgItem(_hSelf, IDC_UD_TRANSPARENT_CHECK), SW_SHOW);
@@ -1650,7 +1650,7 @@ LRESULT CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPAR
 						int result = ::MessageBox(_hSelf, TEXT("Are you sure?"), TEXT("Remove the current language"), MB_YESNO);
 						if (result == IDYES)
 						{
-							int i = ::SendDlgItemMessage(_hSelf, IDC_LANGNAME_COMBO, CB_GETCURSEL, 0, 0);
+							int i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_LANGNAME_COMBO, CB_GETCURSEL, 0, 0));
 							TCHAR langName[256];
 							::SendDlgItemMessage(_hSelf, IDC_LANGNAME_COMBO, CB_GETLBTEXT, i, (LPARAM)langName);
 
@@ -1673,7 +1673,7 @@ LRESULT CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPAR
 				    case IDC_RENAME_BUTTON :
                     {
 						TCHAR langName[256];
-						int i = ::SendDlgItemMessage(_hSelf, IDC_LANGNAME_COMBO, CB_GETCURSEL, 0, 0);
+						int i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_LANGNAME_COMBO, CB_GETCURSEL, 0, 0));
 						::SendDlgItemMessage(_hSelf, IDC_LANGNAME_COMBO, CB_GETLBTEXT, i, (LPARAM)langName);
 
 						StringDlg strDlg;
@@ -1712,7 +1712,7 @@ LRESULT CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPAR
 					case IDC_SAVEAS_BUTTON :
                     {
 						//TCHAR langName[256];
-						int i = ::SendDlgItemMessage(_hSelf, IDC_LANGNAME_COMBO, CB_GETCURSEL, 0, 0);
+						int i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_LANGNAME_COMBO, CB_GETCURSEL, 0, 0));
 						//::SendDlgItemMessage(_hSelf, IDC_LANGNAME_COMBO, CB_GETLBTEXT, i, (LPARAM)langName);
 						if (i == 0)
 							wParam = IDC_ADDNEW_BUTTON;
@@ -1768,7 +1768,7 @@ LRESULT CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPAR
 						bool isChecked = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_UD_TRANSPARENT_CHECK, BM_GETCHECK, 0, 0));
 						if (isChecked)
 						{
-							int percent = ::SendDlgItemMessage(_hSelf, IDC_UD_PERCENTAGE_SLIDER, TBM_GETPOS, 0, 0);
+							int percent = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_UD_PERCENTAGE_SLIDER, TBM_GETPOS, 0, 0));
 							pNppParam->SetTransparent(_hSelf, percent);
 						}
 						else

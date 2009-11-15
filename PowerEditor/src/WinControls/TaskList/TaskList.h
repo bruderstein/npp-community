@@ -39,7 +39,7 @@ public:
 	void init(HINSTANCE hInst, HWND hwnd, HIMAGELIST hImaLst, int nbItem, int index2set);
 	//lint +e1411
 
-	void setFont(TCHAR *fontName, size_t fontSize);
+	void setFont(TCHAR *fontName, int fontSize);
 
 	RECT adjustSize();
 	int getCurrentIndex() const {return _currentIndex;}

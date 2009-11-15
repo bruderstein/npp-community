@@ -29,22 +29,22 @@ public:
 
 private:
 	struct XmlMatchedTagsPos {
-		int tagOpenStart;
-		int tagNameEnd;
-		int tagOpenEnd;
+		DOCPOSITION tagOpenStart;
+		DOCPOSITION tagNameEnd;
+		DOCPOSITION tagOpenEnd;
 
-		int tagCloseStart;
-		int tagCloseEnd;
+		DOCPOSITION tagCloseStart;
+		DOCPOSITION tagCloseEnd;
 	};
 
 	ScintillaEditView *_pEditView;
 
-	int getFirstTokenPosFrom(int targetStart, int targetEnd, const char *token, std::pair<int, int> & foundPos);
-	TagCateg getTagCategory(XmlMatchedTagsPos & tagsPos, int curPos);
-	bool getMatchedTagPos(int searchStart, int searchEnd, const char *tag2find, const char *oppositeTag2find, std::vector<int> oppositeTagFound, XmlMatchedTagsPos & tagsPos);
+	DOCPOSITION getFirstTokenPosFrom(DOCPOSITION targetStart, DOCPOSITION targetEnd, const char *token, std::pair<DOCPOSITION, DOCPOSITION> & foundPos);
+	TagCateg getTagCategory(XmlMatchedTagsPos & tagsPos, DOCPOSITION curPos);
+	bool getMatchedTagPos(DOCPOSITION searchStart, DOCPOSITION searchEnd, const char *tag2find, const char *oppositeTag2find, std::vector<DOCPOSITION> oppositeTagFound, XmlMatchedTagsPos & tagsPos);
 	bool getXmlMatchedTagsPos(XmlMatchedTagsPos & tagsPos);
-	std::vector< std::pair<int, int> > getAttributesPos(int start, int end);
-	bool isInList(int element, std::vector<int> elementList) {
+	std::vector< std::pair<DOCPOSITION, DOCPOSITION> > getAttributesPos(DOCPOSITION start, DOCPOSITION end);
+	bool isInList(DOCPOSITION element, std::vector<DOCPOSITION> elementList) {
 		for (size_t i = 0 ; i < elementList.size() ; i++)
 			if (element == elementList[i])
 				return true;

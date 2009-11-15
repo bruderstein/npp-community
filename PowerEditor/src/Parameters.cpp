@@ -1970,24 +1970,39 @@ void NppParameters::writeSession(const Session* session, const TCHAR *fileName)
 
 		TiXmlNode *mainViewNode = sessionNode->InsertEndChild(TiXmlElement(TEXT("mainView")));
 		(mainViewNode->ToElement())->SetAttribute(TEXT("activeIndex"), (int)session->_activeMainIndex);
+		TCHAR tmp[22];
 		for (size_t i = 0 ; i < session->_mainViewFiles.size() ; i++)
 		{
 			TiXmlNode *fileNameNode = mainViewNode->InsertEndChild(TiXmlElement(TEXT("File")));
 
-			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), session->_mainViewFiles[i]._firstVisibleLine);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), session->_mainViewFiles[i]._xOffset);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), session->_mainViewFiles[i]._scrollWidth);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), session->_mainViewFiles[i]._startPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session->_mainViewFiles[i]._endPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session->_mainViewFiles[i]._selMode);
+			generic_ztoa(session->_mainViewFiles[i]._firstVisibleLine, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), tmp);
+
+			generic_ztoa(session->_mainViewFiles[i]._xOffset, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), tmp);
+
+			generic_ztoa(session->_mainViewFiles[i]._scrollWidth, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), tmp);
+
+			generic_ztoa(session->_mainViewFiles[i]._startPos, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), tmp);
+
+			generic_ztoa(session->_mainViewFiles[i]._endPos, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), tmp);
+
+			generic_ztoa(session->_mainViewFiles[i]._selMode, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), tmp);
+
+
 			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session->_mainViewFiles[i]._langName.c_str());
 			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session->_mainViewFiles[i]._fileName.c_str());
 
 			for (size_t j = 0 ; j < session->_mainViewFiles[i].marks.size() ; j++)
 			{
-				size_t markLine = session->_mainViewFiles[i].marks[j];
+				LINENUMBER markLine = session->_mainViewFiles[i].marks[j];
 				TiXmlNode *markNode = fileNameNode->InsertEndChild(TiXmlElement(TEXT("Mark")));
-				markNode->ToElement()->SetAttribute(TEXT("line"), markLine);
+				generic_ztoa(markLine, tmp, 22, 10);
+				markNode->ToElement()->SetAttribute(TEXT("line"), tmp);
 			}
 		}
 
@@ -1997,20 +2012,33 @@ void NppParameters::writeSession(const Session* session, const TCHAR *fileName)
 		{
 			TiXmlNode *fileNameNode = subViewNode->InsertEndChild(TiXmlElement(TEXT("File")));
 
-			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), session->_subViewFiles[i]._firstVisibleLine);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), session->_subViewFiles[i]._xOffset);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), session->_subViewFiles[i]._scrollWidth);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), session->_subViewFiles[i]._startPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session->_subViewFiles[i]._endPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session->_subViewFiles[i]._selMode);
+			generic_ztoa(session->_subViewFiles[i]._firstVisibleLine, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), tmp);
+
+			generic_ztoa(session->_subViewFiles[i]._xOffset, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), tmp);
+
+			generic_ztoa(session->_subViewFiles[i]._scrollWidth, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), tmp);
+
+			generic_ztoa(session->_subViewFiles[i]._startPos, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), tmp);
+
+			generic_ztoa(session->_subViewFiles[i]._endPos, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), tmp);
+
+			generic_ztoa(session->_subViewFiles[i]._selMode, tmp, 22, 10);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), tmp);
 			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session->_subViewFiles[i]._langName.c_str());
 			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session->_subViewFiles[i]._fileName.c_str());
 
 			for (size_t j = 0 ; j < session->_subViewFiles[i].marks.size() ; j++)
 			{
-				size_t markLine = session->_subViewFiles[i].marks[j];
+				LINENUMBER markLine = session->_subViewFiles[i].marks[j];
 				TiXmlNode *markNode = fileNameNode->InsertEndChild(TiXmlElement(TEXT("Mark")));
-				markNode->ToElement()->SetAttribute(TEXT("line"), markLine);
+
+				generic_ztoa(markLine, tmp, 22, 10);
+				markNode->ToElement()->SetAttribute(TEXT("line"), tmp);
 			}
 		}
 	}

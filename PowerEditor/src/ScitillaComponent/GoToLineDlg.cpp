@@ -50,7 +50,7 @@ LRESULT CALLBACK GoToLineDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*
 							(*_ppEditView)->execute(SCI_ENSUREVISIBLE, line-1);
 							(*_ppEditView)->execute(SCI_GOTOLINE, line-1);
 						} else {
-							int sci_line = (*_ppEditView)->execute(SCI_LINEFROMPOSITION, line);
+							LINENUMBER sci_line = (*_ppEditView)->execute(SCI_LINEFROMPOSITION, line);
 							(*_ppEditView)->execute(SCI_ENSUREVISIBLE, sci_line);
 							(*_ppEditView)->execute(SCI_GOTOPOS, line);
 						}

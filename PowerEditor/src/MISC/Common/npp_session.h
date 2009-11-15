@@ -20,10 +20,10 @@
 
 struct Position
 {
-	size_t _firstVisibleLine;
-	size_t _startPos;
-	size_t _endPos;
-	size_t _xOffset;
+	LINENUMBER _firstVisibleLine;
+	DOCPOSITION _startPos;
+	DOCPOSITION _endPos;
+	DOCPOSITION _xOffset;
 	int _selMode;
 	int _scrollWidth;
 	Position() : _firstVisibleLine(0), _startPos(0), _endPos(0), _xOffset(0), _selMode(0), _scrollWidth(1) {}

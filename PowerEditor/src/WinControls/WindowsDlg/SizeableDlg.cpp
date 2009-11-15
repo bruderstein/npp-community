@@ -66,7 +66,7 @@ LRESULT CALLBACK SizeableDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 		return TRUE;
 
 	case WM_SIZE:
-		onSize(wParam, LOWORD(lParam), HIWORD(lParam));
+		onSize(static_cast<UINT>(wParam), LOWORD(lParam), HIWORD(lParam));
 		return TRUE;
 
 	default:

@@ -635,8 +635,8 @@ void Notepad_plus::saveDockingParams()
 
 	// save every container
 	std::vector<DockingCont*> vCont = _dockingManager->getContainerInfo();
-
-	for (int i = 0 ; i < vCont.size() ; i++)
+	int size = static_cast<int>(vCont.size());
+	for (int i = 0 ; i < size; i++)
 	{
 		// save at first the visible Tb's
 		std::vector<tTbData *>	vDataVis	= vCont[i]->getDataOfVisTb();
@@ -726,7 +726,7 @@ bool Notepad_plus::loadSession(Session* session)
 	assert(_subDocTab);
 	bool allSessionFilesLoaded = true;
 	BufferID lastOpened = BUFFER_INVALID;
-	size_t i = 0;
+	int i = 0;
 	showView(MAIN_VIEW);
 	switchEditViewTo(MAIN_VIEW);	//open files in main
 	for ( ; i < session->nbMainFiles() ; )
@@ -776,7 +776,7 @@ bool Notepad_plus::loadSession(Session* session)
 		}
 	}
 
-	size_t k = 0;
+	int k = 0;
 	showView(SUB_VIEW);
 	switchEditViewTo(SUB_VIEW);	//open files in sub
 	for ( ; k < session->nbSubFiles() ; )
@@ -841,10 +841,10 @@ bool Notepad_plus::loadSession(Session* session)
 	_mainEditView->restoreCurrentPos();
 	_subEditView->restoreCurrentPos();
 
-	if (session->_activeMainIndex < (size_t)_mainDocTab->nbItem())//session->nbMainFiles())
+	if (session->_activeMainIndex < _mainDocTab->nbItem())//session->nbMainFiles())
 		activateBuffer(_mainDocTab->getBufferByIndex(session->_activeMainIndex), MAIN_VIEW);
 
-	if (session->_activeSubIndex < (size_t)_subDocTab->nbItem())//session->nbSubFiles())
+	if (session->_activeSubIndex < _subDocTab->nbItem())//session->nbSubFiles())
 		activateBuffer(_subDocTab->getBufferByIndex(session->_activeSubIndex), SUB_VIEW);
 
 	if ((session->nbSubFiles() > 0) && (session->_activeView == MAIN_VIEW || session->_activeView == SUB_VIEW))
@@ -1689,7 +1689,7 @@ bool Notepad_plus::replaceAllFiles() {
 
 	Buffer * pBuf = NULL;
 
-	int nbTotal = 0;
+	LINENUMBER nbTotal = 0;
 	const bool isEntireDoc = true;
 
     if (_mainWindowStatus & WindowMainActive)
@@ -1891,7 +1891,7 @@ bool Notepad_plus::replaceInFiles()
 
 	bool isRecursive = _findReplaceDlg->isRecursive();
 	bool isInHiddenDir = _findReplaceDlg->isInHiddenDir();
-	int nbTotal = 0;
+	LINENUMBER nbTotal = 0;
 
 	ScintillaEditView *pOldView = _pEditView;
 	_pEditView = _invisibleEditView;
@@ -1937,7 +1937,7 @@ bool Notepad_plus::replaceInFiles()
 			_invisibleEditView->execute(SCI_SETCODEPAGE, pBuf->getUnicodeMode() == uni8Bit ? 0 : SC_CP_UTF8);
 			_invisibleEditView->_currentBuffer = pBuf;
 
-			int nbReplaced = _findReplaceDlg->processAll(ProcessReplaceAll, NULL, NULL, true, fileNames.at(i).c_str());
+			LINENUMBER nbReplaced = _findReplaceDlg->processAll(ProcessReplaceAll, NULL, NULL, true, fileNames.at(i).c_str());
 			nbTotal += nbReplaced;
 			if (nbReplaced)
 			{
@@ -1975,7 +1975,7 @@ bool Notepad_plus::findInFiles()
 
 	bool isRecursive = _findReplaceDlg->isRecursive();
 	bool isInHiddenDir = _findReplaceDlg->isInHiddenDir();
-	int nbTotal = 0;
+	LINENUMBER nbTotal = 0;
 	ScintillaEditView *pOldView = _pEditView;
 	_pEditView = _invisibleEditView;
 	Document oldDoc = _invisibleEditView->execute(SCI_GETDOCPOINTER);
@@ -2046,7 +2046,7 @@ bool Notepad_plus::findInOpenedFiles()
 {
 	assert(_findReplaceDlg);
 
-	int nbTotal = 0;
+	LINENUMBER nbTotal = 0;
 	ScintillaEditView *pOldView = _pEditView;
 	_pEditView = _invisibleEditView;
 	Document oldDoc = _invisibleEditView->execute(SCI_GETDOCPOINTER);
@@ -2098,7 +2098,7 @@ bool Notepad_plus::findInOpenedFiles()
 bool Notepad_plus::findInCurrentFile()
 {
 	assert(_findReplaceDlg);
-	int nbTotal = 0;
+	LINENUMBER nbTotal = 0;
 	Buffer * pBuf = _pEditView->getCurrentBuffer();
 	ScintillaEditView *pOldView = _pEditView;
 	_pEditView = _invisibleEditView;
@@ -3184,7 +3184,7 @@ void Notepad_plus::replaceMarkedline(int ln, const TCHAR *str)
 	int lineEnd = _pEditView->execute(SCI_GETLINEENDPOSITION, ln);
 
 	_pEditView->replaceTarget(str, lineBegin, lineEnd);
-}
+  }
 
 generic_string Notepad_plus::getMarkedLine(int ln)
 {
@@ -3199,14 +3199,14 @@ generic_string Notepad_plus::getMarkedLine(int ln)
 	return line;
 }
 
-void Notepad_plus::findMatchingBracePos(int & braceAtCaret, int & braceOpposite)
+void Notepad_plus::findMatchingBracePos(DOCPOSITION & braceAtCaret, DOCPOSITION & braceOpposite)
 {
-	int caretPos = int(_pEditView->execute(SCI_GETCURRENTPOS));
+	DOCPOSITION caretPos = _pEditView->execute(SCI_GETCURRENTPOS);
 	braceAtCaret = -1;
 	braceOpposite = -1;
 	TCHAR charBefore = '\0';
 	//TCHAR styleBefore = '\0';
-	int lengthDoc = int(_pEditView->execute(SCI_GETLENGTH));
+	DOCPOSITION lengthDoc = _pEditView->execute(SCI_GETLENGTH);
 
 	if ((lengthDoc > 0) && (caretPos > 0))
     {
@@ -3234,8 +3234,8 @@ void Notepad_plus::findMatchingBracePos(int & braceAtCaret, int & braceOpposite)
 
 void Notepad_plus::braceMatch()
 {
-	int braceAtCaret = -1;
-	int braceOpposite = -1;
+	DOCPOSITION braceAtCaret = -1;
+	DOCPOSITION braceOpposite = -1;
 	findMatchingBracePos(braceAtCaret, braceOpposite);
 
 	if ((braceAtCaret != -1) && (braceOpposite == -1))
@@ -3249,8 +3249,8 @@ void Notepad_plus::braceMatch()
 
 		if (_pEditView->isShownIndentGuide())
         {
-            int columnAtCaret = int(_pEditView->execute(SCI_GETCOLUMN, braceAtCaret));
-		    int columnOpposite = int(_pEditView->execute(SCI_GETCOLUMN, braceOpposite));
+            DOCPOSITION columnAtCaret = _pEditView->execute(SCI_GETCOLUMN, braceAtCaret);
+		    DOCPOSITION columnOpposite = _pEditView->execute(SCI_GETCOLUMN, braceOpposite);
 			_pEditView->execute(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite)?columnAtCaret:columnOpposite);
         }
     }
@@ -3979,8 +3979,8 @@ void Notepad_plus::command(int id)
 
 		case IDM_SEARCH_GOTOMATCHINGBRACE :
 		{
-			int braceAtCaret = -1;
-			int braceOpposite = -1;
+			DOCPOSITION braceAtCaret = -1;
+			DOCPOSITION braceOpposite = -1;
 			findMatchingBracePos(braceAtCaret, braceOpposite);
 
 			if (braceOpposite != -1)
@@ -4654,7 +4654,7 @@ void Notepad_plus::command(int id)
 				_pEditView->saveCurrentPos();
 
 				// Cut all text
-				int docLen = _pEditView->getCurrentDocLen();
+				DOCPOSITION docLen = _pEditView->getCurrentDocLen();
 				_pEditView->execute(SCI_COPYRANGE, 0, docLen);
 				_pEditView->execute(SCI_CLEARALL);
 
@@ -4706,7 +4706,7 @@ void Notepad_plus::command(int id)
 				else if (size < NB_MIN_CHAR)
 					size = NB_MIN_CHAR;
 
-				nppGUI._autocFromLen = size;
+				nppGUI._autocFromLen = static_cast<int>(size);
 			}
 			break;
 		}
@@ -6062,19 +6062,19 @@ void Notepad_plus::performPostReload(int whichOne) {
 
 void Notepad_plus::bookmarkNext(bool forwardScan)
 {
-	int lineno = _pEditView->getCurrentLineNumber();
+	LINENUMBER lineno = _pEditView->getCurrentLineNumber();
 	int sci_marker = SCI_MARKERNEXT;
-	int lineStart = lineno + 1;	//Scan starting from next line
-	int lineRetry = 0;				//If not found, try from the beginning
+	LINENUMBER lineStart = lineno + 1;	//Scan starting from next line
+	LINENUMBER lineRetry = 0;				//If not found, try from the beginning
 	if (!forwardScan)
     {
 		lineStart = lineno - 1;		//Scan starting from previous line
-		lineRetry = int(_pEditView->execute(SCI_GETLINECOUNT));	//If not found, try from the end
+		lineRetry = _pEditView->execute(SCI_GETLINECOUNT);	//If not found, try from the end
 		sci_marker = SCI_MARKERPREVIOUS;
 	}
-	int nextLine = int(_pEditView->execute(sci_marker, lineStart, 1 << MARK_BOOKMARK));
+	LINENUMBER nextLine = _pEditView->execute(sci_marker, lineStart, 1 << MARK_BOOKMARK);
 	if (nextLine < 0)
-		nextLine = int(_pEditView->execute(sci_marker, lineRetry, 1 << MARK_BOOKMARK));
+		nextLine = _pEditView->execute(sci_marker, lineRetry, 1 << MARK_BOOKMARK);
 
 	if (nextLine < 0)
 		return;
@@ -7324,7 +7324,7 @@ bool Notepad_plus::doBlockComment(comment_mode currCommentMode)
     _pEditView->execute(SCI_BEGINUNDOACTION);
 
     for (LINENUMBER i = selStartLine; i <= selEndLine; i++)
-	{
+    {
 		LINENUMBER lineStart = _pEditView->execute(SCI_POSITIONFROMLINE, i);
         LINENUMBER lineIndent = lineStart;
         LINENUMBER lineEnd = _pEditView->execute(SCI_GETLINEENDPOSITION, i);
@@ -8926,14 +8926,14 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			Session session2Load;
 			if (pNppParam->loadSession(&session2Load, sessionFileName))
 			{
-				size_t i = 0;
+				int i = 0;
 				for ( ; i < session2Load.nbMainFiles() ; )
 				{
 					const TCHAR *pFn = session2Load._mainViewFiles[i]._fileName.c_str();
 					lstrcpy(sessionFileArray[i++], pFn);
 				}
 
-				for (size_t j = 0 ; j < session2Load.nbSubFiles() ; j++)
+				for (int j = 0 ; j < session2Load.nbSubFiles() ; j++)
 				{
 					const TCHAR *pFn = session2Load._subViewFiles[j]._fileName.c_str();
 					lstrcpy(sessionFileArray[i++], pFn);
@@ -9106,11 +9106,11 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				}
 
 				int counter = 0;
-				int lastLine = int(_pEditView->execute(SCI_GETLINECOUNT)) - 1;
-				int currLine = _pEditView->getCurrentLineNumber();
+				LINENUMBER lastLine = _pEditView->execute(SCI_GETLINECOUNT) - 1;
+				LINENUMBER currLine = _pEditView->getCurrentLineNumber();
 				int indexMacro = _runMacroDlg->getMacro2Exec();
-				int deltaLastLine = 0;
-				int deltaCurrLine = 0;
+				LINENUMBER deltaLastLine = 0;
+				LINENUMBER deltaCurrLine = 0;
 
 				Macro m = _macro;
 
@@ -9134,7 +9134,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 					else // run until eof
 					{
 						bool cursorMovedUp = deltaCurrLine < 0;
-						deltaLastLine = int(_pEditView->execute(SCI_GETLINECOUNT)) - 1 - lastLine;
+						deltaLastLine = _pEditView->execute(SCI_GETLINECOUNT) - 1 - lastLine;
 						deltaCurrLine = _pEditView->getCurrentLineNumber() - currLine;
 
 						if (( deltaCurrLine == 0 )	// line no. not changed?
@@ -10836,7 +10836,7 @@ void Notepad_plus::setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *fil
 	_findReplaceDlg->setFindInFilesDirFilter(dir, filter);
 }
 
-void Notepad_plus::bookmarkAdd(int lineno) const
+void Notepad_plus::bookmarkAdd(LINENUMBER lineno) const
 {
 	if (lineno == -1)
 		lineno = _pEditView->getCurrentLineNumber();
@@ -10844,7 +10844,7 @@ void Notepad_plus::bookmarkAdd(int lineno) const
 		_pEditView->execute(SCI_MARKERADD, lineno, MARK_BOOKMARK);
 }
 
-void Notepad_plus::bookmarkDelete(int lineno) const
+void Notepad_plus::bookmarkDelete(LINENUMBER lineno) const
 {
 	if (lineno == -1)
 		lineno = _pEditView->getCurrentLineNumber();
@@ -10852,7 +10852,7 @@ void Notepad_plus::bookmarkDelete(int lineno) const
 		_pEditView->execute(SCI_MARKERDELETE, lineno, MARK_BOOKMARK);
 }
 
-bool Notepad_plus::bookmarkPresent(int lineno) const
+bool Notepad_plus::bookmarkPresent(LINENUMBER lineno) const
 {
 	if (lineno == -1)
 		lineno = _pEditView->getCurrentLineNumber();
@@ -10860,7 +10860,7 @@ bool Notepad_plus::bookmarkPresent(int lineno) const
 	return ((state & (1 << MARK_BOOKMARK)) != 0);
 }
 
-void Notepad_plus::bookmarkToggle(int lineno) const
+void Notepad_plus::bookmarkToggle(LINENUMBER lineno) const
 {
 	if (lineno == -1)
 		lineno = _pEditView->getCurrentLineNumber();
@@ -10873,9 +10873,9 @@ void Notepad_plus::bookmarkToggle(int lineno) const
 
 void Notepad_plus::copyMarkedLines()
 {
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
+	LINENUMBER lastLine = _pEditView->lastZeroBasedLineNumber();
 	generic_string globalStr = TEXT("");
-	for (int i = lastLine ; i >= 0 ; i--)
+	for (LINENUMBER i = lastLine ; i >= 0 ; i--)
 	{
 		if (bookmarkPresent(i))
 		{
@@ -10888,11 +10888,11 @@ void Notepad_plus::copyMarkedLines()
 
 void Notepad_plus::cutMarkedLines()
 {
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
+	LINENUMBER lastLine = _pEditView->lastZeroBasedLineNumber();
 	generic_string globalStr = TEXT("");
 
 	_pEditView->execute(SCI_BEGINUNDOACTION);
-	for (int i = lastLine ; i >= 0 ; i--)
+	for (LINENUMBER i = lastLine ; i >= 0 ; i--)
 	{
 		if (bookmarkPresent(i))
 		{
@@ -10908,10 +10908,10 @@ void Notepad_plus::cutMarkedLines()
 
 void Notepad_plus::deleteMarkedLines()
 {
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
+	LINENUMBER lastLine = _pEditView->lastZeroBasedLineNumber();
 
 	_pEditView->execute(SCI_BEGINUNDOACTION);
-	for (int i = lastLine ; i >= 0 ; i--)
+	for (LINENUMBER i = lastLine ; i >= 0 ; i--)
 	{
 		if (bookmarkPresent(i))
 			deleteMarkedline(i);
@@ -10930,7 +10930,7 @@ void Notepad_plus::pasteToMarkedLines()
 	BOOL canPaste = ::IsClipboardFormatAvailable(clipFormat);
 	if (!canPaste)
 		return;
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
+	LINENUMBER lastLine = _pEditView->lastZeroBasedLineNumber();
 
 	::OpenClipboard(_hSelf);
 	HANDLE clipboardData = ::GetClipboardData(clipFormat);
@@ -10942,7 +10942,7 @@ void Notepad_plus::pasteToMarkedLines()
 	::CloseClipboard();
 
 	_pEditView->execute(SCI_BEGINUNDOACTION);
-	for (int i = lastLine ; i >= 0 ; i--)
+	for (LINENUMBER i = lastLine ; i >= 0 ; i--)
 	{
 		if (bookmarkPresent(i))
 		{
@@ -10952,7 +10952,7 @@ void Notepad_plus::pasteToMarkedLines()
 	_pEditView->execute(SCI_ENDUNDOACTION);
 }
 
-void Notepad_plus::deleteMarkedline(int ln)
+void Notepad_plus::deleteMarkedline(LINENUMBER ln)
 {
 	int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
 	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
@@ -10962,7 +10962,7 @@ void Notepad_plus::deleteMarkedline(int ln)
 	_pEditView->replaceTarget(emptyString, lineBegin, lineBegin + lineLen);
 }
 
-void Notepad_plus::replaceMarkedline(int ln, const TCHAR *str)
+void Notepad_plus::replaceMarkedline(LINENUMBER ln, const TCHAR *str)
 {
 	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
 	int lineEnd = _pEditView->execute(SCI_GETLINEENDPOSITION, ln);
@@ -10970,7 +10970,7 @@ void Notepad_plus::replaceMarkedline(int ln, const TCHAR *str)
 	_pEditView->replaceTarget(str, lineBegin, lineEnd);
 }
 
-generic_string Notepad_plus::getMarkedLine(int ln)
+generic_string Notepad_plus::getMarkedLine(LINENUMBER ln)
 {
 	int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
 	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);

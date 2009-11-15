@@ -89,19 +89,19 @@ public :
 	bool processFindNext(const TCHAR *txt2find, FindOption *options = NULL, FindStatus *oFindStatus = NULL);
 	bool processReplace(const TCHAR *txt2find, const TCHAR *txt2replace, FindOption *options = NULL);
 
-	int markAll(const TCHAR *txt2find, int styleID);
-	//int markAll2(const TCHAR *str2find);
-	int markAllInc(const TCHAR *str2find, FindOption *opt);
+	LINENUMBER markAll(const TCHAR *txt2find, int styleID);
+	//LINENUMBER markAll2(const TCHAR *str2find);
+	LINENUMBER markAllInc(const TCHAR *str2find, FindOption *opt);
 
 
-	int processAll(ProcessOperation op, const TCHAR *txt2find, const TCHAR *txt2replace, bool isEntire = false, const TCHAR *fileName = NULL, FindOption *opt = NULL, int colourStyleID = -1);
-	int processRange(ProcessOperation op, const TCHAR *txt2find, const TCHAR *txt2replace, int startRange, int endRange, const TCHAR *fileName = NULL, FindOption *opt = NULL, int colourStyleID = -1);
+	LINENUMBER processAll(ProcessOperation op, const TCHAR *txt2find, const TCHAR *txt2replace, bool isEntire = false, const TCHAR *fileName = NULL, FindOption *opt = NULL, int colourStyleID = -1);
+	LINENUMBER processRange(ProcessOperation op, const TCHAR *txt2find, const TCHAR *txt2replace, DOCPOSITION startRange, DOCPOSITION endRange, const TCHAR *fileName = NULL, FindOption *opt = NULL, int colourStyleID = -1);
 	void replaceAllInOpenedDocs();
 	void findAllIn(InWhat op);
 	void setSearchText(TCHAR * txt2find);
 	void gotoNextFoundResult(int direction = 0);
 
-	void putFindResult(int result) {
+	void putFindResult(LINENUMBER result) {
 		_findAllResult = result;
 	};
 	const TCHAR * getDir2Search() const {return _directory.c_str();};
@@ -125,7 +125,7 @@ public :
 	void changeTabName(DIALOG_TYPE index, const TCHAR *name2change);
 	void beginNewFilesSearch();
 
-	void finishFilesSearch(int count);
+	void finishFilesSearch(LINENUMBER count);
 
 	void focusOnFinder();
 
@@ -159,7 +159,7 @@ private :
 	Finder  *_pFinder;
 	bool _isRTL;
 
-	int _findAllResult;
+	LINENUMBER _findAllResult;
 
 	// JOCE either remove the magic number, or use a std::string if possible.
 	TCHAR _findAllResultStr[1024];

@@ -54,7 +54,7 @@ public:
 		return !(a == b);
 	}
 
-	virtual int doDialog();
+	virtual INT_PTR doDialog();
 
 	virtual bool isValid() const;
 	virtual bool isEnabled() const {	//true if _keyCombo != 0, false if _keyCombo == 0, in which case no accelerator should be made
@@ -114,7 +114,7 @@ public:
 	generic_string toString() const;
 	generic_string toString(int index) const;
 
-	int doDialog();
+	INT_PTR doDialog();
 
 	//only compares the internal KeyCombos, nothing else
 	friend const bool operator==(const ScintillaKeyMap & a, const ScintillaKeyMap & b);

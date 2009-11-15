@@ -94,7 +94,7 @@ void SmartHighlighter::highlightView(ScintillaEditView * pHighlightView)
 	fo._isWholeWord = true;
 
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
-	unsigned int cp = pHighlightView->execute(SCI_GETCODEPAGE);
+	unsigned int cp = static_cast<int>(pHighlightView->execute(SCI_GETCODEPAGE));
 	const TCHAR * text2FindW = wmc->char2wchar(text2Find, cp);
 	const TCHAR * searchText = text2FindW;
 

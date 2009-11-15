@@ -327,7 +327,8 @@ void getNameStrFromCmd(INT cmd, generic_string & str)
 	{
 		std::vector<PluginCmdShortcut> & pluginCmds = (NppParameters::getInstance())->getPluginCommandList();
 		int i = 0;
-		for (size_t j = 0 ; j < pluginCmds.size() ; j++)
+		int size = static_cast<int>(pluginCmds.size());
+		for (int j = 0 ; j < size ; j++)
 		{
 			if (pluginCmds[j].getID() == cmd)
 			{
@@ -389,7 +390,7 @@ LRESULT CALLBACK Shortcut::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 			::SendDlgItemMessage(_hSelf, IDC_SHIFT_CHECK, BM_SETCHECK, _keyCombo._isShift?BST_CHECKED:BST_UNCHECKED, 0);
 			::EnableWindow(::GetDlgItem(_hSelf, IDOK), isValid() && (textlen > 0 || !_canModifyName));
 			int iFound = -1;
-			for (size_t i = 0 ; i < nrKeys ; i++)
+			for (int i = 0 ; i < nrKeys ; i++)
 			{
 				::SendDlgItemMessage(_hSelf, IDC_KEY_COMBO, CB_ADDSTRING, 0, (LPARAM)namedKeyArray[i].name);
 
@@ -411,17 +412,17 @@ LRESULT CALLBACK Shortcut::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 			switch (wParam)
 			{
 				case IDC_CTRL_CHECK :
-					_keyCombo._isCtrl = BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0);
+					_keyCombo._isCtrl = BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<UINT>(wParam), BM_GETCHECK, 0, 0);
 					::EnableWindow(::GetDlgItem(_hSelf, IDOK), isValid() && (textlen > 0 || !_canModifyName));
 					return TRUE;
 
 				case IDC_ALT_CHECK :
-					_keyCombo._isAlt = BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0);
+					_keyCombo._isAlt = BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<UINT>(wParam), BM_GETCHECK, 0, 0);
 					::EnableWindow(::GetDlgItem(_hSelf, IDOK), isValid() && (textlen > 0 || !_canModifyName));
 					return TRUE;
 
 				case IDC_SHIFT_CHECK :
-					_keyCombo._isShift = BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0);
+					_keyCombo._isShift = BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<UINT>(wParam), BM_GETCHECK, 0, 0);
 					return TRUE;
 
 				case IDOK :
@@ -453,7 +454,7 @@ LRESULT CALLBACK Shortcut::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 					{
 						if (LOWORD(wParam) == IDC_KEY_COMBO)
 						{
-							int i = ::SendDlgItemMessage(_hSelf, LOWORD(wParam), CB_GETCURSEL, 0, 0);
+							int i = static_cast<int>(::SendDlgItemMessage(_hSelf, LOWORD(wParam), CB_GETCURSEL, 0, 0));
 							_keyCombo._key = namedKeyArray[i].id;
 							::EnableWindow(::GetDlgItem(_hSelf, IDOK), isValid() && (textlen > 0 || !_canModifyName));
 							::ShowWindow(::GetDlgItem(_hSelf, IDC_WARNING_STATIC), isEnabled()?SW_HIDE:SW_SHOW);
@@ -468,7 +469,7 @@ LRESULT CALLBACK Shortcut::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 	}
 }
 
-int Shortcut::doDialog()
+INT_PTR Shortcut::doDialog()
 {
 	return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUT_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
 }
@@ -707,7 +708,7 @@ void recordedMacroStep::PlayBack(Window* pNotepad, ScintillaEditView *pEditView)
 
 	else
 	{
-		long lParam = lParameter;
+		LONG_PTR lParam = lParameter;
 		if (MacroType == mtUseSParameter)
 			lParam = reinterpret_cast<LONG_PTR>(sParameter.c_str());
 		pEditView->execute(message, wParameter, lParam);
@@ -752,7 +753,7 @@ void ScintillaAccelerator::updateKeys()
 			ScintillaKeyMap skm = map[j];
 			if (skm.isEnabled())
 			{		//no validating, scintilla accepts more keys
-				int size = skm.getSize();
+				int size = static_cast<int>(skm.getSize());
 				for(index = 0; index < size; index++)
 					::SendMessage(_vScintillas[i], SCI_ASSIGNCMDKEY, skm.toKeyDef(index), skm.getScintillaKeyID());
 			}
@@ -815,7 +816,7 @@ void ScintillaKeyMap::validateDialog() {
 }
 
 void ScintillaKeyMap::showCurrentSettings() {
-	int i = ::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_GETCURSEL, 0, 0);
+	int i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_GETCURSEL, 0, 0));
 	_keyCombo = _keyCombos[i];
 	::SendDlgItemMessage(_hSelf, IDC_CTRL_CHECK,	BM_SETCHECK, _keyCombo._isCtrl?BST_CHECKED:BST_UNCHECKED, 0);
 	::SendDlgItemMessage(_hSelf, IDC_ALT_CHECK,		BM_SETCHECK, _keyCombo._isAlt?BST_CHECKED:BST_UNCHECKED, 0);
@@ -868,19 +869,19 @@ LRESULT CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARA
 			switch (wParam)
 			{
 				case IDC_CTRL_CHECK :
-					_keyCombo._isCtrl = BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0);
+					_keyCombo._isCtrl = BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<int>(wParam), BM_GETCHECK, 0, 0);
 					//applyToCurrentIndex();
 					validateDialog();
 					return TRUE;
 
 				case IDC_ALT_CHECK :
-					_keyCombo._isAlt = BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0);
+					_keyCombo._isAlt = BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<int>(wParam), BM_GETCHECK, 0, 0);
 					//applyToCurrentIndex();
 					validateDialog();
 					return TRUE;
 
 				case IDC_SHIFT_CHECK :
-					_keyCombo._isShift = BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0);
+					_keyCombo._isShift = BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<int>(wParam), BM_GETCHECK, 0, 0);
 					//applyToCurrentIndex();
 					return TRUE;
 
@@ -913,7 +914,7 @@ LRESULT CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARA
 				case IDC_BUTTON_RMVE: {
 					if (size == 1)	//cannot delete last shortcut
 						return TRUE;
-					int i = ::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_GETCURSEL, 0, 0);
+					int i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_GETCURSEL, 0, 0));
 					removeKeyComboByIndex(i);
 					::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_DELETESTRING, i, 0);
 					if (i == size)
@@ -934,7 +935,7 @@ LRESULT CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARA
 						switch(LOWORD(wParam)) {
 							case IDC_KEY_COMBO:
 							{
-								int i = ::SendDlgItemMessage(_hSelf, IDC_KEY_COMBO, CB_GETCURSEL, 0, 0);
+								int i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_KEY_COMBO, CB_GETCURSEL, 0, 0));
 								_keyCombo._key = namedKeyArray[i].id;
 								//applyToCurrentIndex();
 								validateDialog();
@@ -957,7 +958,7 @@ LRESULT CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARA
 	}
 }
 
-int ScintillaKeyMap::doDialog()
+INT_PTR ScintillaKeyMap::doDialog()
 {
 	return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUTSCINT_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
 }

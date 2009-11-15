@@ -59,13 +59,13 @@ void TaskListDlg::init( HINSTANCE hInst, HWND parent, HIMAGELIST hImgLst, bool d
 	_initDir = dir;
 }
 
-int TaskListDlg::doDialog( bool isRTL /*= false*/ )
+INT_PTR TaskListDlg::doDialog( bool isRTL /*= false*/ )
 {
 	if (isRTL)
 	{
 		DLGTEMPLATE *pMyDlgTemplate = NULL;
 		HGLOBAL hMyDlgTemplate = makeRTLResource(IDD_VALUE_DLG, &pMyDlgTemplate);
-		int result = ::DialogBoxIndirectParam(_hInst, pMyDlgTemplate, _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
+		INT_PTR result = ::DialogBoxIndirectParam(_hInst, pMyDlgTemplate, _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
 		::GlobalFree(hMyDlgTemplate);
 		return result;
 	}
@@ -79,7 +79,7 @@ LRESULT CALLBACK TaskListDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM l
 		case WM_INITDIALOG :
 		{
 			::SendMessage(_hParent, WM_GETTASKLISTINFO, (WPARAM)&_taskListInfo, 0);
-			int nbTotal = _taskListInfo._tlfsLst.size();
+			int nbTotal = static_cast<int>(_taskListInfo._tlfsLst.size());
 
 			int i2set = _taskListInfo._currentIndex + (_initDir == dirDown?1:-1);
 			if (i2set < 0)
@@ -174,7 +174,7 @@ LRESULT CALLBACK TaskListDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM l
 			{
 				case ID_PICKEDUP :
 				{
-					int listIndex = lParam;
+					int listIndex = static_cast<int>(lParam);
 					int view2set = _taskListInfo._tlfsLst[listIndex]._iView;
 					int index2Switch = _taskListInfo._tlfsLst[listIndex]._docIndex;
 					::SendMessage(_hParent, NPPM_ACTIVATEDOC, view2set, index2Switch);

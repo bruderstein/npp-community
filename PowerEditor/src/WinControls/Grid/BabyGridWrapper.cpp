@@ -60,7 +60,7 @@ void BabyGridWrapper::setColsNumbered( bool isNumbered /*= true*/ )
 	::SendMessage(_hSelf, BGM_SETCOLSNUMBERED, isNumbered?TRUE:FALSE, 0);
 }
 
-void BabyGridWrapper::setText( size_t row, size_t col, const TCHAR *text )
+void BabyGridWrapper::setText( int row, int col, const TCHAR *text )
 {
 	_BGCELL cell;
 	cell.row = row;
@@ -75,7 +75,7 @@ void BabyGridWrapper::makeColAutoWidth( bool autoWidth /*= true*/ )
 
 int BabyGridWrapper::getSelectedRow()
 {
-	return ::SendMessage(_hSelf, BGM_GETROW, 0, 0);
+	return static_cast<int>(::SendMessage(_hSelf, BGM_GETROW, 0, 0));
 }
 
 void BabyGridWrapper::deleteCell( int row, int col )

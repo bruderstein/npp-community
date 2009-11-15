@@ -199,6 +199,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	}
 #endif
 
+	// For testing X64.  Locks lower 4Gb of memory
+	//VirtualAlloc(NULL, 2^32, MEM_RESERVE, PAGE_READONLY);
 	MiniDumper mdump;	//for debugging purposes.
 
 	bool TheFirstOne = true;

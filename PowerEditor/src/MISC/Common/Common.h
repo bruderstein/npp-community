@@ -42,12 +42,12 @@
 	#define generic_stat _wstat
 	#define generic_sprintf swprintf
 	#define COPYDATA_FILENAMES COPYDATA_FILENAMESW
-	#ifdef _W64
+	#ifdef _WIN64
 		#define generic_atoz _wtoi64
 	    #define generic_ztoa _i64tow_s
 	#else
 		#define generic_atoz _wtol
-		#define generic_ztoa _wtoi64
+		#define generic_ztoa _ltow_s
 	#endif
 
 #else

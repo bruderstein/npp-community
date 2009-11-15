@@ -57,7 +57,7 @@ class WindowsDlg : public SizeableDlg
 
 public :
 	WindowsDlg();
-	int doDialog(TiXmlNodeA *dlgNode);
+	INT_PTR doDialog(TiXmlNodeA *dlgNode);
 	virtual void init(HINSTANCE hInst, HWND parent, DocTabView *pTab);
 
 	void doRefresh(bool invalidate = false);

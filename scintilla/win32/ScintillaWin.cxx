@@ -190,7 +190,7 @@ class ScintillaWin :
 	HWND MainHWND();
 
 	static sptr_t DirectFunction(
-		    ScintillaWin *sci, UINT iMessage, uptr_t wParam, sptr_t lParam);
+		    ScintillaWin *sci, UINT iMessage, WPARAM wParam, LPARAM lParam);
 	static sptr_t PASCAL SWndProc(
 		    HWND hWnd, UINT iMessage, WPARAM wParam, sptr_t lParam);
 	static sptr_t PASCAL CTWndProc(

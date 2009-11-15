@@ -35,7 +35,7 @@ static generic_string changeExt(generic_string fn, generic_string ext)
 	}
 	else
 	{
-		int len = (extension.length() > fnExt.length() - index + 1)?extension.length():fnExt.length() - index + 1;
+		int len = static_cast<int>((extension.length() > fnExt.length() - index + 1)?extension.length():fnExt.length() - index + 1);
 		fnExt.replace(index, len, extension);
 	}
 	return fnExt;
@@ -165,7 +165,7 @@ int FileDialog::setExtsFilter(const TCHAR *extText, const TCHAR *exts)
 	extFilter += TEXT(")");
 
 	// Resize filter buffer
-	int nbCharAdditional = extFilter.length() + lstrlen(exts) + 3; // 3 additional for nulls
+	int nbCharAdditional = static_cast<int>(extFilter.length()) + lstrlen(exts) + 3; // 3 additional for nulls
 	if (_fileExt)
 	{
 		oldFilter = new TCHAR[_nbCharFileExt];
@@ -189,7 +189,7 @@ int FileDialog::setExtsFilter(const TCHAR *extText, const TCHAR *exts)
 	// Append new filter
     TCHAR *pFileExt = _fileExt + _nbCharFileExt;
 	lstrcpy(pFileExt, extFilter.c_str());
-    _nbCharFileExt += extFilter.length() + 1;
+    _nbCharFileExt += static_cast<int>(extFilter.length()) + 1;
 
     pFileExt = _fileExt + _nbCharFileExt;
 	lstrcpy(pFileExt, exts);
@@ -312,7 +312,7 @@ static HWND hFileDlg = NULL;
 static WNDPROC oldProc = NULL;
 static generic_string currentExt = TEXT("");
 
-static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+static LRESULT CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message)
     {
 		case WM_COMMAND :
@@ -362,9 +362,9 @@ static generic_string addExt(HWND textCtrl, HWND typeCtrl) {
 	TCHAR fn[MAX_PATH];
 	::GetWindowText(textCtrl, fn, MAX_PATH);
 
-	int i = ::SendMessage(typeCtrl, CB_GETCURSEL, 0, 0);
+	int i = static_cast<int>(::SendMessage(typeCtrl, CB_GETCURSEL, 0, 0));
 
-	int cbTextLen = ::SendMessage(typeCtrl, CB_GETLBTEXTLEN, i, 0);
+	int cbTextLen = static_cast<int>(::SendMessage(typeCtrl, CB_GETLBTEXTLEN, i, 0));
 	TCHAR * ext = new TCHAR[cbTextLen + 1];
 	::SendMessage(typeCtrl, CB_GETLBTEXT, i, (LPARAM)ext);
 
@@ -441,7 +441,7 @@ BOOL APIENTRY FileDialog::run(HWND hWnd, UINT uMsg, WPARAM /*wParam*/, LPARAM lP
 				case CDN_FILEOK :
 				{
 					HWND typeControl = ::GetDlgItem(::GetParent(hWnd), cmb1);
-					int index = ::SendMessage(typeControl, CB_GETCURSEL, 0, 0);
+					int index = static_cast<int>(::SendMessage(typeControl, CB_GETCURSEL, 0, 0));
 					NppParameters *pNppParam = NppParameters::getInstance();
 					pNppParam->setFileSaveDlgFilterIndex(index);
 					return TRUE;

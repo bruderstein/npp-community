@@ -56,16 +56,16 @@ bool AutoCompletion::showAutoComplete() {
 	if (!_funcCompletionActive)
 		return false;
 
-	int curPos = int(_pEditView->execute(SCI_GETCURRENTPOS));
-	int line = _pEditView->getCurrentLineNumber();
-	int startLinePos = int(_pEditView->execute(SCI_POSITIONFROMLINE, line ));
+	DOCPOSITION curPos = _pEditView->execute(SCI_GETCURRENTPOS);
+	LINENUMBER line = _pEditView->getCurrentLineNumber();
+	DOCPOSITION startLinePos = _pEditView->execute(SCI_POSITIONFROMLINE, line );
 
-	int len = curPos-startLinePos;
+	DOCPOSITION len = curPos-startLinePos;
 	char * lineBuffer = new char[len+1];
 	_pEditView->getText(lineBuffer, startLinePos, curPos);
 
-	int offset = len-1;
-	int nrChars = 0;
+	DOCPOSITION offset = len-1;
+	DOCPOSITION nrChars = 0;
 	char c;
 	while (offset>=0)
 	{
@@ -78,11 +78,11 @@ bool AutoCompletion::showAutoComplete() {
 		offset--;
 
 	}
-	int startWordPos = curPos-nrChars;
+	DOCPOSITION startWordPos = curPos-nrChars;
 
 	_pEditView->execute(SCI_AUTOCSETSEPARATOR, WPARAM('\n'));
 	_pEditView->execute(SCI_AUTOCSETIGNORECASE, _ignoreCase);
-	_pEditView->showAutoComletion(curPos - startWordPos, _keyWords.c_str());
+	_pEditView->showAutoCompletion(curPos - startWordPos, _keyWords.c_str());
 
 	_activeCompletion = CompletionAuto;
 	return true;
@@ -90,8 +90,8 @@ bool AutoCompletion::showAutoComplete() {
 
 bool AutoCompletion::showWordComplete(bool autoInsert)
 {
-	int curPos = int(_pEditView->execute(SCI_GETCURRENTPOS));
-	int startPos = int(_pEditView->execute(SCI_WORDSTARTPOSITION, curPos, true));
+	DOCPOSITION curPos = _pEditView->execute(SCI_GETCURRENTPOS);
+	DOCPOSITION startPos = _pEditView->execute(SCI_WORDSTARTPOSITION, curPos, true);
 
 	if (curPos == startPos)
 		return false;
@@ -109,18 +109,18 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 	expr += beginChars;
 	expr += TEXT("[^ \\t.,;:\"()=<>'+!\\[\\]]*");
 
-	int docLength = int(_pEditView->execute(SCI_GETLENGTH));
+	DOCPOSITION docLength = _pEditView->execute(SCI_GETLENGTH);
 
 	int flags = SCFIND_WORDSTART | SCFIND_MATCHCASE | SCFIND_REGEXP | SCFIND_POSIX;
 
 	_pEditView->execute(SCI_SETSEARCHFLAGS, flags);
 	std::vector<generic_string> wordArray;
-	int posFind = _pEditView->searchInTarget(expr.c_str(), 0, docLength);
+	DOCPOSITION posFind = _pEditView->searchInTarget(expr.c_str(), 0, docLength);
 
 	while (posFind != -1)
 	{
-		int wordStart = int(_pEditView->execute(SCI_GETTARGETSTART));
-		int wordEnd = int(_pEditView->execute(SCI_GETTARGETEND));
+		DOCPOSITION wordStart = _pEditView->execute(SCI_GETTARGETSTART);
+		DOCPOSITION wordEnd = _pEditView->execute(SCI_GETTARGETEND);
 
 		size_t foundTextLen = wordEnd - wordStart;
 
@@ -162,7 +162,7 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 	// UNICODE TO DO
 	_pEditView->execute(SCI_AUTOCSETSEPARATOR, WPARAM(' '));
 	_pEditView->execute(SCI_AUTOCSETIGNORECASE, _ignoreCase);
-	_pEditView->showAutoComletion(curPos - startPos, words.c_str());
+	_pEditView->showAutoCompletion(curPos - startPos, words.c_str());
 
 	_activeCompletion = CompletionWord;
 	return true;

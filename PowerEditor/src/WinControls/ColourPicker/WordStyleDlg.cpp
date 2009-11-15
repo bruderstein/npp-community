@@ -49,12 +49,12 @@ private :
 	COLORREF _colour;
 	WNDPROC _oldProc;
 
-	static BOOL CALLBACK staticProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+	static LRESULT CALLBACK staticProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		ColourStaticTextHooker *pColourStaticTextHooker = reinterpret_cast<ColourStaticTextHooker *>(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
 		return pColourStaticTextHooker->colourStaticProc(hwnd, message, wParam, lParam);
 	};
-	BOOL CALLBACK colourStaticProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK colourStaticProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 };
 
 WordStyleDlg::WordStyleDlg():
@@ -117,7 +117,7 @@ void WordStyleDlg::restoreGlobalOverrideValues()
 
 Style & WordStyleDlg::getCurrentStyler()
 {
-	int styleIndex = ::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_GETCURSEL, 0, 0);
+	int styleIndex = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_GETCURSEL, 0, 0));
 	if (styleIndex == LB_ERR)
 	{
 		styleIndex = 0;
@@ -136,7 +136,7 @@ Style & WordStyleDlg::getCurrentStyler()
 
 int WordStyleDlg::whichTabColourIndex()
 {
-	int i = ::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_GETCURSEL, 0, 0);
+	int i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_GETCURSEL, 0, 0));
 	if (i == LB_ERR)
 		return -1;
 	TCHAR styleName[128];
@@ -215,7 +215,7 @@ void WordStyleDlg::showGlobalOverrideCtrls(bool show)
 }
 
 
-BOOL CALLBACK ColourStaticTextHooker::colourStaticProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ColourStaticTextHooker::colourStaticProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch(Message)
     {
@@ -293,7 +293,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 			for(size_t i = 0 ; i < themeSwitcher.size() ; i++)
 			{
 				std::pair<generic_string, generic_string> & themeInfo = themeSwitcher.getElementFromIndex(i);
-				int j = ::SendMessage(_hSwitch2ThemeCombo, CB_ADDSTRING, 0, (LPARAM)themeInfo.first.c_str());
+				int j = static_cast<int>(::SendMessage(_hSwitch2ThemeCombo, CB_ADDSTRING, 0, (LPARAM)themeInfo.first.c_str()));
 				if (! themeInfo.second.compare( nppParamInst->getNppGUI()._themeName ) )
 				{
 					_currentThemeIndex = j;
@@ -315,7 +315,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 			const std::vector<generic_string> & fontlist = (NppParameters::getInstance())->getFontList();
 			for (size_t i = 0 ; i < fontlist.size() ; i++)
 			{
-				int j = ::SendMessage(_hFontNameCombo, CB_ADDSTRING, 0, (LPARAM)fontlist[i].c_str());
+				int j = static_cast<int>(::SendMessage(_hFontNameCombo, CB_ADDSTRING, 0, (LPARAM)fontlist[i].c_str()));
 				::SendMessage(_hFontNameCombo, CB_SETITEMDATA, j, (LPARAM)fontlist[i].c_str());
 			}
 
@@ -380,7 +380,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 		{
 			if ((HWND)lParam == ::GetDlgItem(_hSelf, IDC_SC_PERCENTAGE_SLIDER))
 			{
-				int percent = ::SendDlgItemMessage(_hSelf, IDC_SC_PERCENTAGE_SLIDER, TBM_GETPOS, 0, 0);
+				int percent = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_SC_PERCENTAGE_SLIDER, TBM_GETPOS, 0, 0));
 				(NppParameters::getInstance())->SetTransparent(_hSelf, percent);
 			}
 			return TRUE;
@@ -479,7 +479,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 							updateThemeName(_themeName);
 							_restoreInvalid = false;
 
-							_currentThemeIndex = ::SendMessage(_hSwitch2ThemeCombo, CB_GETCURSEL, 0, 0);
+							_currentThemeIndex = static_cast<int>(::SendMessage(_hSwitch2ThemeCombo, CB_GETCURSEL, 0, 0));
 							::EnableWindow(::GetDlgItem(_hSelf, IDOK), FALSE);
 							_isDirty = false;
 						}
@@ -497,7 +497,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 						bool isChecked = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_SC_TRANSPARENT_CHECK, BM_GETCHECK, 0, 0));
 						if (isChecked)
 						{
-							int percent = ::SendDlgItemMessage(_hSelf, IDC_SC_PERCENTAGE_SLIDER, TBM_GETPOS, 0, 0);
+							int percent = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_SC_PERCENTAGE_SLIDER, TBM_GETPOS, 0, 0));
 							(NppParameters::getInstance())->SetTransparent(_hSelf, percent);
 						}
 						else
@@ -510,7 +510,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 					case IDC_GLOBAL_FG_CHECK :
 					{
 						GlobalOverride & glo = (NppParameters::getInstance())->getGlobalOverrideStyle();
-						glo.enableFg = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0));
+						glo.enableFg = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<UINT>(wParam), BM_GETCHECK, 0, 0));
 						notifyDataModified();
 						apply();
 						return TRUE;
@@ -519,7 +519,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 					case  IDC_GLOBAL_BG_CHECK:
 					{
 						GlobalOverride & glo = (NppParameters::getInstance())->getGlobalOverrideStyle();
-						glo.enableBg = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0));
+						glo.enableBg = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<UINT>(wParam), BM_GETCHECK, 0, 0));
 						notifyDataModified();
 						apply();
 						return TRUE;
@@ -528,7 +528,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 					case IDC_GLOBAL_FONT_CHECK :
 					{
 						GlobalOverride & glo = (NppParameters::getInstance())->getGlobalOverrideStyle();
-						glo.enableFont = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0));
+						glo.enableFont = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<UINT>(wParam), BM_GETCHECK, 0, 0));
 						notifyDataModified();
 						apply();
 						return TRUE;
@@ -536,7 +536,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 					case IDC_GLOBAL_FONTSIZE_CHECK :
 					{
 						GlobalOverride & glo = (NppParameters::getInstance())->getGlobalOverrideStyle();
-						glo.enableFontSize = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0));
+						glo.enableFontSize = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<UINT>(wParam), BM_GETCHECK, 0, 0));
 						notifyDataModified();
 						apply();
 						return TRUE;
@@ -544,7 +544,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 					case IDC_GLOBAL_BOLD_CHECK :
 					{
 						GlobalOverride & glo = (NppParameters::getInstance())->getGlobalOverrideStyle();
-						glo.enableBold = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0));
+						glo.enableBold = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<UINT>(wParam), BM_GETCHECK, 0, 0));
 						notifyDataModified();
 						apply();
 						return TRUE;
@@ -553,7 +553,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 					case IDC_GLOBAL_ITALIC_CHECK :
 					{
 						GlobalOverride & glo = (NppParameters::getInstance())->getGlobalOverrideStyle();
-						glo.enableItalic = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0));
+						glo.enableItalic = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<UINT>(wParam), BM_GETCHECK, 0, 0));
 						notifyDataModified();
 						apply();
 						return TRUE;
@@ -561,7 +561,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 					case IDC_GLOBAL_UNDERLINE_CHECK :
 					{
 						GlobalOverride & glo = (NppParameters::getInstance())->getGlobalOverrideStyle();
-						glo.enableUnderLine = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, wParam, BM_GETCHECK, 0, 0));
+						glo.enableUnderLine = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, static_cast<UINT>(wParam), BM_GETCHECK, 0, 0));
 						notifyDataModified();
 						apply();
 						return TRUE;
@@ -587,7 +587,7 @@ LRESULT CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 										break;
 									case IDC_LANGUAGES_LIST :
 									{
-										int i = ::SendDlgItemMessage(_hSelf, LOWORD(wParam), LB_GETCURSEL, 0, 0);
+										int i = static_cast<int>(::SendDlgItemMessage(_hSelf, LOWORD(wParam), LB_GETCURSEL, 0, 0));
 										if (i != LB_ERR)
 										{
 											bool prevThemeState = _isThemeDirty;
@@ -721,7 +721,7 @@ void WordStyleDlg::updateColour(bool which)
 void WordStyleDlg::updateFontSize()
 {
 	Style & style = getCurrentStyler();
-	int iFontSizeSel = ::SendMessage(_hFontSizeCombo, CB_GETCURSEL, 0, 0);
+	int iFontSizeSel = static_cast<int>(::SendMessage(_hFontSizeCombo, CB_GETCURSEL, 0, 0));
 
 	TCHAR intStr[5];
 	if (iFontSizeSel != 0)
@@ -754,7 +754,7 @@ void WordStyleDlg::updateUserKeywords()
 	Style & style = getCurrentStyler();
 	//const int NB_MAX = 2048;
 	//TCHAR kw[NB_MAX];
-	int len = ::SendDlgItemMessage(_hSelf, IDC_USER_KEYWORDS_EDIT, WM_GETTEXTLENGTH, 0, 0);
+	int len = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_USER_KEYWORDS_EDIT, WM_GETTEXTLENGTH, 0, 0));
 	len +=1;
 	TCHAR *kw = new TCHAR[len];
 	::SendDlgItemMessage(_hSelf, IDC_USER_KEYWORDS_EDIT, WM_GETTEXT, len, (LPARAM)kw);
@@ -766,7 +766,7 @@ void WordStyleDlg::updateUserKeywords()
 void WordStyleDlg::updateFontName()
 {
     Style & style = getCurrentStyler();
-	int iFontSel = ::SendMessage(_hFontNameCombo, CB_GETCURSEL, 0, 0);
+	int iFontSel = static_cast<int>(::SendMessage(_hFontNameCombo, CB_GETCURSEL, 0, 0));
 	TCHAR *fnStr = (TCHAR *)::SendMessage(_hFontNameCombo, CB_GETITEMDATA, iFontSel, 0);
 	style._fontName = fnStr;
 }
@@ -791,7 +791,7 @@ void WordStyleDlg::updateFontStyleStatus(fontStyleType whitchStyle)
 		hWnd = _hCheckItalic;
 	}
 
-	int isChecked = ::SendMessage(hWnd, BM_GETCHECK, 0, 0);
+	int isChecked = static_cast<int>(::SendMessage(hWnd, BM_GETCHECK, 0, 0));
 	if (isChecked != BST_INDETERMINATE)
 	{
 		if (isChecked == BST_CHECKED)
@@ -803,7 +803,7 @@ void WordStyleDlg::updateFontStyleStatus(fontStyleType whitchStyle)
 
 void WordStyleDlg::switchToTheme()
 {
-	int iSel = ::SendMessage(_hSwitch2ThemeCombo, CB_GETCURSEL, 0, 0);
+	int iSel = static_cast<int>(::SendMessage(_hSwitch2ThemeCombo, CB_GETCURSEL, 0, 0));
 
 	generic_string prevThemeName(_themeName);
 	_themeName.clear();
@@ -888,12 +888,12 @@ void WordStyleDlg::setVisualFromStyleList()
 
 	str[0] = '\0';
 
-	int i = ::SendDlgItemMessage(_hSelf, IDC_LANGUAGES_LIST, LB_GETCURSEL, 0, 0);
+	int i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_LANGUAGES_LIST, LB_GETCURSEL, 0, 0));
 	if (i == LB_ERR)
 		return;
 	::SendDlgItemMessage(_hSelf, IDC_LANGUAGES_LIST, LB_GETTEXT, i, (LPARAM)str);
 
-	i = ::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_GETCURSEL, 0, 0);
+	i = static_cast<int>(::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_GETCURSEL, 0, 0));
 	if (i == LB_ERR)
 		return;
 	TCHAR styleName[64];
@@ -929,7 +929,7 @@ void WordStyleDlg::setVisualFromStyleList()
 
 	//-- font name
 	isEnable = true;
-	int iFontName = ::SendMessage(_hFontNameCombo, CB_FINDSTRING, 1, (LPARAM)style._fontName.c_str());
+	int iFontName = static_cast<int>(::SendMessage(_hFontNameCombo, CB_FINDSTRING, 1, (LPARAM)style._fontName.c_str()));
 	if (iFontName == CB_ERR)
 		iFontName = 0;
 	::SendMessage(_hFontNameCombo, CB_SETCURSEL, iFontName, 0);
@@ -942,7 +942,7 @@ void WordStyleDlg::setVisualFromStyleList()
 	if (style._fontSize != -1)
 	{
 		wsprintf(intStr, TEXT("%d"), style._fontSize);
-		iFontSize = ::SendMessage(_hFontSizeCombo, CB_FINDSTRING, 1, (LPARAM)intStr);
+		iFontSize = static_cast<int>(::SendMessage(_hFontSizeCombo, CB_FINDSTRING, 1, (LPARAM)intStr));
 		isEnable = true;
 	}
 	::SendMessage(_hFontSizeCombo, CB_SETCURSEL, iFontSize, 0);

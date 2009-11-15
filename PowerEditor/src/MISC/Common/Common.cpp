@@ -475,7 +475,7 @@ TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename)
 	{
 		TCHAR cnvName[MAX_PATH*2];
 		convertFileName(cnvName, filename);
-		assert(len - (itr-buffer) == static_cast<UINT>(len - (itr-buffer)));
+		assert(len - (itr-buffer) == static_cast<INT>(len - (itr-buffer)));
 		PathCompactPathEx(itr, filename, static_cast<UINT>(len - (itr-buffer)), 0);
 	}
 	return buffer;

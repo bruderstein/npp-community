@@ -475,10 +475,10 @@ private:
 
 	void addHotSpot(bool docIsModifing = false);
 
-    void bookmarkAdd(int lineno) const;
-    void bookmarkDelete(int lineno) const;
-    bool bookmarkPresent(int lineno) const;
-    void bookmarkToggle(int lineno) const;
+    void bookmarkAdd(LINENUMBER lineno) const;
+    void bookmarkDelete(LINENUMBER lineno) const;
+    bool bookmarkPresent(LINENUMBER lineno) const;
+    void bookmarkToggle(LINENUMBER lineno) const;
     void bookmarkNext(bool forwardScan);
 	void bookmarkClearAll() const;
 
@@ -486,11 +486,11 @@ private:
 	void cutMarkedLines();
 	void deleteMarkedLines();
 	void pasteToMarkedLines();
-	void deleteMarkedline(int ln);
-	void replaceMarkedline(int ln, const TCHAR *str);
-	generic_string getMarkedLine(int ln);
+	void deleteMarkedline(LINENUMBER ln);
+	void replaceMarkedline(LINENUMBER ln, const TCHAR *str);
+	generic_string getMarkedLine(LINENUMBER ln);
 
-    void findMatchingBracePos(int & braceAtCaret, int & braceOpposite);
+    void findMatchingBracePos(DOCPOSITION & braceAtCaret, DOCPOSITION & braceOpposite);
     void braceMatch();
 
     void activateNextDoc(bool direction);

@@ -189,9 +189,9 @@ bool FunctionCallTip::getCursorFunction() {
 		_currentParam = curValue.param;
 
 		bool same = false;
-		if(_ignoreCase)
+			if(_ignoreCase)
 			same = CompareNoCase(_funcName, funcToken.token) == 0;
-		else
+			else
 			same = (_funcName == funcToken.token);
 
 		if (!same) {	//check if we need to reload data
@@ -229,13 +229,13 @@ bool FunctionCallTip::loadFunction() {
 			const TCHAR* attrib = funcNode->Attribute(TEXT("func"));
 			generic_string val = attrib ? attrib : TEXT("");
 			if (val == TEXT("yes")) {
-				//what we've been looking for
-				_curFunction = funcNode;
-				break;
-			} else {
-				//name matches, but not a function, abort the entire procedure
-				return false;
-			}
+					//what we've been looking for
+					_curFunction = funcNode;
+					break;
+				} else {
+					//name matches, but not a function, abort the entire procedure
+					return false;
+				}
 		} else if (compVal > 0) {	//too far, abort
 			return false;
 		}
@@ -288,14 +288,15 @@ void FunctionCallTip::showCalltip() {
 		return;
 	}
 
-	//Check if the current overload still holds. If the current param exceeds amount in overload, see if another one fits better (enough params)
+	//Check if the current overload still holds. If the current param exceeds amounti n overload, see if another one fits better (enough params)
 	stringVec & params = _overloads.at(_currentOverload);
-	size_t psize = params.size()+1, osize;
-	if ((size_t)_currentParam >= psize) {
+	size_t psize = params.size()+1;
+	size_t osize;
+	if (_currentParam >= psize) {
 		osize = _overloads.size();
 		for(size_t i = 0; i < osize; i++) {
 			psize = _overloads.at(i).size()+1;
-			if ((size_t)_currentParam < psize) {
+			if (_currentParam < psize) {
 				_currentOverload = i;
 				break;
 			}
