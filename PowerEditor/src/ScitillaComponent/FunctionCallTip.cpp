@@ -295,7 +295,7 @@ void FunctionCallTip::showCalltip() {
 	if (_currentParam >= psize) {
 		osize = static_cast<int>(_overloads.size());
 		for(int i = 0; i < osize; i++) {
-			psize = _overloads.at(i).size()+1;
+			psize = static_cast<int>(_overloads.at(i).size())+1;
 			if (_currentParam < psize) {
 				_currentOverload = i;
 				break;
@@ -318,8 +318,8 @@ void FunctionCallTip::showCalltip() {
 
 	stream << curRetValText << TEXT(" ") << _funcName << TEXT(" (");
 
-	int highlightstart = 0;
-	int highlightend = 0;
+	DOCPOSITION highlightstart = 0;
+	DOCPOSITION highlightend = 0;
 	for(int i = 0; i < nrParams; i++) {
 		if (i == _currentParam) {
 			highlightstart = stream.str().length();

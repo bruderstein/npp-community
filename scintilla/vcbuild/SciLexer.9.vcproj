@@ -118,6 +118,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)\scintilla\win32\gen-versioninfo.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -144,7 +145,7 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="precompiled_headers.h"
 				WarningLevel="4"
-				WarnAsError="true"
+				WarnAsError="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>

@@ -127,6 +127,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)\PowerEditor\src\gen-versioninfo.h&quot;&#x0D;&#x0A;"
+				ExcludedFromBuild="false"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
